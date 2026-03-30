@@ -59,6 +59,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 </div>
               )}
               <Button 
+                aria-label="Recarregar a página"
                 className="w-full bg-slate-900 hover:bg-slate-800 text-white" 
                 onClick={() => window.location.reload()}
               >

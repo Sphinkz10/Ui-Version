@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { logger } from '@/lib/logger';
 import { createClient } from '@supabase/supabase-js';
 
 /**
  * CRON: Sync Athlete Metrics
- * Schedule: Every 30 minutes (*/30 * * * *)
+ * Schedule: Every 30 minutes (* /30 * * * *)
  * Purpose: Sync athlete metrics, recalculate baselines, update dashboards
  */
 
@@ -30,8 +31,14 @@ export async function GET(request: NextRequest) {
   
   try {
     // Verify cron secret
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const authHeader = request.headers.get('authorization') || '';
+    const expectedAuth = `Bearer ${process.env.CRON_SECRET || ''}`;
+    
+    if (
+      !process.env.CRON_SECRET ||
+      authHeader.length !== expectedAuth.length ||
+      !crypto.timingSafeEqual(Buffer.from(authHeader), Buffer.from(expectedAuth))
+    ) {
       logger.warn('Unauthorized cron job attempt', {
         module: 'CronSyncMetrics',
         ip: request.headers.get('x-forwarded-for')

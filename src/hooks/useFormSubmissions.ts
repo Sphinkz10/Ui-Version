@@ -15,6 +15,7 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner@2.0.3';
 import { safeEvaluateFormula } from '@/utils/safeFormulaEvaluator';
+import { useApp } from '@/contexts/AppContext';
 
 export interface FormSubmission {
   id: string;
@@ -55,8 +56,10 @@ interface UseFormSubmissionsReturn {
 }
 
 export function useFormSubmissions(
-  workspaceId: string = 'default-workspace'
+  customWorkspaceId?: string
 ): UseFormSubmissionsReturn {
+  const { workspace } = useApp();
+  const workspaceId = customWorkspaceId || workspace?.id || 'default-workspace';
   
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
   const [loading, setLoading] = useState(false);

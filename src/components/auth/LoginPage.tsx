@@ -126,6 +126,7 @@ export function LoginPage({ onRegisterClick }: LoginPageProps) {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Ocultar palavra-passe" : "Mostrar palavra-passe"}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                   disabled={isLoading}
                 >

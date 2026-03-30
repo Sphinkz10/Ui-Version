@@ -1,562 +1,395 @@
-# Relatório de Auditoria Pós-Produção — Protocolo C8
+# Relatorio de Auditoria Pos-Producao — Protocolo C8
 
 **Projecto:** PerformTrack (V-Login2)
-**Data:** 28 de Março de 2026
+**Data:** 2026-03-30
 **Protocolo:** C8 – Post-Production Resilience & Governance v1.0
 **Auditor:** Claude (Audit Post-Production Plugin)
-**Stack:** React 18.3 + Vite 6.3.5 + Supabase + Vercel + Capacitor (Android)
 
 ---
 
-## Sumário Executivo
+## Sumario Executivo
 
-### Score Global: 3.0/10 🟠 Fraco
+### Score Global: 5.7/10
 
-| Módulo | Score | Status |
+| Modulo | Score | Status |
 |---|---|---|
-| M1 — UAT & Validação | 5/10 | 🟡 Médio |
-| M2 — Monitorização e Observabilidade | 3/10 | 🟠 Fraco |
-| M3 — Testes de Carga e Performance | 2/10 | 🔴 Crítico |
-| M4 — Documentação Técnica | 3/10 | 🟠 Fraco |
-| M5 — CI/CD Pipeline | 4/10 | 🟠 Fraco |
-| M6 — Governança | 2/10 | 🔴 Crítico |
-| M7 — Segurança Pós-Deploy | 2/10 | 🔴 Crítico |
-
-> **Fórmula ponderada aplicada:** M2×1.5 + M5×1.3 + M7×1.3 + M6×1.2 + M1+M3+M4×1.0 ÷ 8.3
-> Score calculado: (3×1.5)+(4×1.3)+(2×1.3)+(2×1.2)+5+2+3 ÷ 8.3 = **24.7 ÷ 8.3 = 3.0**
+| M1 — UAT & Validacao | 1.0/10 | Critico |
+| M2 — Monitorizacao | 3.0/10 | Fraco |
+| M3 — Testes de Carga | 8.0/10 | Bom |
+| M4 — Documentacao | 3.0/10 | Fraco |
+| M5 — CI/CD Pipeline | 10.0/10 | Excelente |
+| M6 — Governanca | 5.0/10 | Medio |
+| M7 — Seguranca Pos-Deploy | 9.0/10 | Excelente |
 
 ### Achados por Severidade
 
 | Severidade | Quantidade |
 |---|---|
-| 🔴 CRITICAL | 4 |
-| 🟠 HIGH | 5 |
-| 🟡 MEDIUM | 6 |
-| 🔵 LOW | 5 |
-| ⚪ INFO | 3 |
+| CRITICAL | 2 |
+| HIGH | 4 |
+| MEDIUM | 6 |
+| LOW | 3 |
+| INFO | 1 |
 
-### Diagnóstico Rápido
+### Diagnostico Rapido
 
-O PerformTrack tem uma **base técnica promissora** (React 18, TypeScript strict, Tailwind, Supabase) mas apresenta **lacunas graves ao nível de resiliência e governança** que impedem uma entrada segura em produção. O problema mais crítico é a **exposição de credenciais Supabase no ficheiro `.env`** versionado, combinada com a ausência de headers de segurança essenciais (CSP, HSTS) e a falta completa de processos de governança (branch protection, code review obrigatório, dependabot). O pipeline CI/CD está bem concebido em papel (387 linhas, 10 jobs) mas está **localizado em `src/workflows/ci.yml` em vez de `.github/workflows/ci.yml`**, o que significa que muito provavelmente não está a ser executado pelo GitHub Actions. A monitorização tem Sentry configurado mas sem logs estruturados, sem dashboards operacionais reais, sem uptime monitor e sem health check endpoint. O projecto precisa de 1-2 semanas de trabalho focalizado em segurança e governança antes de poder ir a produção.
+Projecto com excelente pipeline CI/CD (11 jobs, deploy auto, Snyk, Lighthouse) e boa postura de seguranca pos-deploy. No entanto, apresenta lacunas criticas em UAT (zero documentacao de testes de aceitacao) e monitorizacao operacional (Sentry presente mas sem SLOs, dashboards ou alertas). A documentacao tecnica e fraca, sem ARCHITECTURE.md, CONTRIBUTING.md, CHANGELOG.md ou DEPLOY.md. Os testes de carga sao um ponto forte com k6 (basic, API, spike) bem configurados.
 
-**Maturidade operacional:** Nível 2 — Repetível (práticas existem em esboço mas não são consistentes nem aplicadas)
+**Maturidade operacional:** Repetivel (Nivel 2 CMMI)
 
 ---
 
 ## Achados Detalhados
 
-### 🔴 CRITICAL
+### CRITICAL
 
-#### C-01 — Credenciais Supabase Expostas em Repositório
+#### C8-001 — Ausencia Total de UAT & Sign-Off
 
-- **Módulo:** M7 — Segurança Pós-Deploy
-- **Localização:** `.env` (raiz do projecto, versionado)
-- **Descrição:** O ficheiro `.env` contém credenciais activas do Supabase — URL da instância e a chave anónima JWT — versionadas no repositório. Qualquer pessoa com acesso ao repositório tem acesso directo à base de dados de produção. A chave anónima JWT é decodificável online (base64) e permite autenticação directa na Supabase API sem passar pela aplicação.
-- **Risco:** Acesso não autorizado à base de dados. Exfiltração de dados de atletas e coaches. Violação de RGPD. Se o repo for público, os dados estão completamente expostos.
-- **Remediação:**
-  1. Revogar imediatamente a chave anónima no dashboard Supabase
-  2. Gerar nova chave e guardar **apenas** em variáveis de ambiente do servidor (Vercel dashboard, GitHub Secrets)
-  3. Adicionar `.env` ao `.gitignore` raiz
-  4. Criar `.env.example` com placeholders
-  5. Auditar o git history para remover credenciais (`git filter-repo` ou BFG Repo Cleaner)
-- **Esforço estimado:** S (2-4h) — urgente, fazer hoje
+- **Modulo:** M1 — UAT & Validacao
+- **Localizacao:** Raiz do projecto
+- **Descricao:** Nao existe nenhum documento de plano de testes UAT, sign-off formal, criterios de aceitacao mensuraveis, ou registo de resultados de validacao. Zero ficheiros como `test-plan.md`, `UAT.md`, `UAT_SIGN_OFF.md`, ou `known-issues.md`.
+- **Risco:** Sem validacao formal de aceitacao, funcionalidades podem ir para producao sem confirmacao de que cumprem requisitos de negocio. Bugs criticos podem passar despercebidos. Sem rastreabilidade de quem aprovou o go-live.
+- **Remediacao:** Criar `docs/UAT.md` com: cenarios de teste mapeados a user stories, criterios de aceitacao mensuraveis (ex: "atleta consegue ver historico de sessoes em <2s"), template de sign-off com data e responsavel, e registo de resultados por cenario.
+- **Esforco estimado:** 2-3 dias
 
-```bash
-# .gitignore DEVE conter:
-.env
-.env.local
-.env.production
-.env.*.local
+#### C8-002 — Monitorizacao sem Alertas e sem SLOs
 
-# Revogar e rodar credenciais imediatamente
-# https://supabase.com/dashboard → Settings → API → Regenerate anon key
-```
+- **Modulo:** M2 — Monitorizacao
+- **Localizacao:** Configuracao global
+- **Descricao:** Sentry esta configurado (client + server + edge) e Pino logger existe como dependencia. No entanto: nao existem SLIs/SLOs definidos, nao ha dashboards operacionais (Grafana, Datadog, etc.), nao ha alertas configurados (PagerDuty, OpsGenie, Slack alerts), e nao existe monitor de uptime (UptimeRobot, Betterstack).
+- **Risco:** Erros em producao podem passar despercebidos por horas/dias. Sem SLOs, nao ha forma objectiva de medir saude do servico. Sem alertas, incidentes dependem de utilizadores reportarem.
+- **Remediacao:** (1) Definir SLIs: p99 latencia, error rate, uptime. (2) Definir SLOs: p99 < 500ms, error rate < 1%, uptime > 99.9%. (3) Configurar Sentry alerts para error spikes. (4) Adicionar UptimeRobot para health check endpoint. (5) Criar dashboard operacional basico.
+- **Esforco estimado:** 3-5 dias
 
 ---
 
-#### C-02 — Pipeline CI/CD Localizado Fora da Pasta `.github/workflows/`
+### HIGH
 
-- **Módulo:** M5 — CI/CD Pipeline
-- **Localização:** `src/workflows/ci.yml` (errado) → deveria ser `.github/workflows/ci.yml`
-- **Descrição:** O pipeline CI/CD (387 linhas, 10 jobs bem concebidos) está guardado em `src/workflows/ci.yml`. O GitHub Actions **apenas detecta e executa workflows em `.github/workflows/`**. Como o ficheiro está dentro de `src/`, o pipeline nunca foi executado. Todos os quality gates (lint, tests, security scan, deploy) são actualmente processos manuais ou inexistentes em prática.
-- **Risco:** Zero automação em produção. Qualquer push para `main` pode fazer deploy sem passar por testes. Falhas silenciosas de qualidade.
-- **Remediação:**
-  1. Mover `src/workflows/ci.yml` → `.github/workflows/ci.yml`
-  2. Criar pasta `.github/` na raiz se não existir
-  3. Verificar que o workflow funciona com `gh workflow run ci.yml`
-  4. Confirmar primeiro run com sucesso antes de qualquer deploy
-- **Esforço estimado:** XS (30min) + debugging do primeiro run
+#### C8-003 — Ausencia de ARCHITECTURE.md
 
-```bash
-mkdir -p .github/workflows
-mv src/workflows/ci.yml .github/workflows/ci.yml
-git add .github/workflows/ci.yml
-git rm src/workflows/ci.yml
-git commit -m "fix: move CI workflow to correct .github/workflows location"
-```
+- **Modulo:** M4 — Documentacao
+- **Localizacao:** Raiz do projecto
+- **Descricao:** Nao existe documentacao de arquitectura. O projecto tem uma arquitectura complexa (React + Next.js + Vite + Supabase + Capacitor) mas sem diagramas, decisoes arquitecturais documentadas, ou explicacao de como os modulos se interligam.
+- **Remediacao:** Criar `ARCHITECTURE.md` com: diagrama de componentes (Mermaid), fluxo de dados, decisoes de stack, e mapeamento de modulos (Decision Engine, Scheduling Engine, Live Sessions, etc.).
+- **Esforco estimado:** 1 dia
 
----
+#### C8-004 — Ausencia de DEPLOY.md
 
-#### C-03 — Ausência de Branch Protection e Code Review
+- **Modulo:** M4 — Documentacao
+- **Localizacao:** Raiz do projecto
+- **Descricao:** Nao existe documentacao de deployment. O deploy e feito via Vercel (evidenciado no CI), mas nao ha guia de: como fazer rollback, variaveis de ambiente necessarias em producao, procedimento de deploy manual de emergencia, ou checklist pre-deploy.
+- **Remediacao:** Criar `DEPLOY.md` com: pre-requisitos, variaveis de ambiente, procedimento de deploy, procedimento de rollback, e troubleshooting.
+- **Esforco estimado:** 4 horas
 
-- **Módulo:** M6 — Governança
-- **Localização:** Configuração GitHub (não detectada)
-- **Descrição:** Não foram encontrados ficheiros `.github/settings.yml`, `CODEOWNERS`, ou evidência de branch protection rules configuradas. Qualquer developer (ou acidente) pode fazer push directo para `main` sem revisão ou testes. Com o pipeline no sítio errado (ver C-02), não há qualquer travão no caminho para produção.
-- **Risco:** Deploy de código não revisto em produção. Impossibilidade de rastrear quem aprovou o quê. Violação de boas práticas de segurança.
-- **Remediação:**
-  1. Activar Branch Protection em `main` no GitHub: Settings → Branches → Add rule
-  2. Require pull request reviews: mínimo 1 aprovação
-  3. Require status checks to pass: `lint`, `test-unit`, `build`
-  4. Require branches to be up to date before merging
-  5. Criar `.github/CODEOWNERS` com owners por área
+#### C8-005 — README Raiz Inadequado
 
-```yaml
-# .github/settings.yml (com GitHub Settings App)
-branches:
-  - name: main
-    protection:
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-      required_status_checks:
-        strict: true
-        contexts: [lint, test-unit, build]
-      enforce_admins: false
-      restrictions: null
-```
+- **Modulo:** M4 — Documentacao
+- **Localizacao:** `README.md`
+- **Descricao:** O README raiz tem apenas 3 linhas: introducao basica, link para Figma, e `npm i && npm run dev`. Nao inclui: visao geral do projecto, features, requisitos, configuracao de ambiente, ou como contribuir.
+- **Remediacao:** Expandir com: descricao do projecto, arquitectura de alto nivel, pre-requisitos, setup completo (incluindo Supabase), scripts disponiveis, e links para documentacao adicional.
+- **Esforco estimado:** 2 horas
+
+#### C8-006 — Sem Code Review Obrigatorio Verificavel
+
+- **Modulo:** M6 — Governanca
+- **Localizacao:** `.github/`
+- **Descricao:** Existe PR template detalhado (`.github/PULL_REQUEST_TEMPLATE.md`) com checklists de qualidade, seguranca e testes. Contudo, nao ha evidencia de branch protection rules que forcam code review obrigatorio (min. 1 aprovacao). A configuracao de branch protection vive no GitHub e nao no repositorio.
+- **Remediacao:** Configurar branch protection em `main` e `develop`: require pull request, require 1+ approval, require status checks (lint, test-unit, build).
+- **Esforco estimado:** 30 minutos
 
 ---
 
-#### C-04 — Ausência Total de Testes de Carga
+### MEDIUM / LOW
 
-- **Módulo:** M3 — Testes de Carga
-- **Localização:** Projecto (nenhum script encontrado)
-- **Descrição:** Não foram encontrados scripts de teste de carga (k6, Locust, Artillery, JMeter). O projecto tem Lighthouse CI no pipeline (performance page load) mas isso não é um teste de carga — não testa comportamento sob tráfego concorrente, não testa endpoints API, não testa a Supabase sob stress. Para uma aplicação de gestão de atletas com potencial de múltiplos coaches e centenas de atletas simultâneos, a ausência de testes de carga é crítica antes do go-live.
-- **Risco:** A aplicação pode colapsar com 50+ utilizadores simultâneos sem aviso prévio. A Supabase free tier tem limites de conexões que podem ser atingidos facilmente.
-- **Remediação:** Criar scripts k6 básicos para os endpoints críticos.
-
-```javascript
-// tests/load/basic-load.js (k6)
-import http from 'k6/http';
-import { check } from 'k6';
-
-export const options = {
-  vus: 50,
-  duration: '5m',
-  thresholds: {
-    http_req_duration: ['p95<500'],
-    http_req_failed: ['rate<0.05'],
-  },
-};
-
-export default function () {
-  const res = http.get('https://YOUR_APP/api/health');
-  check(res, { 'status was 200': (r) => r.status === 200 });
-}
-```
+| # | ID | Severidade | Modulo | Descricao | Remediacao | Esforco |
+|---|---|---|---|---|---|---|
+| 1 | C8-007 | MEDIUM | M4 | Sem CONTRIBUTING.md | Criar guia de contribuicao com convencoes, processo de PR, e coding standards | 2h |
+| 2 | C8-008 | MEDIUM | M4 | Sem CHANGELOG.md | Iniciar changelog seguindo Keep a Changelog / Semantic Versioning | 1h |
+| 3 | C8-009 | MEDIUM | M6 | Sem CODEOWNERS | Criar `CODEOWNERS` para atribuir reviewers por area (calendar, athletes, dataos) | 30min |
+| 4 | C8-010 | MEDIUM | M6 | Sem post-mortem process | Criar template de post-mortem em `docs/post-mortem/TEMPLATE.md` | 1h |
+| 5 | C8-011 | MEDIUM | M2 | Sem uptime monitor | Configurar UptimeRobot ou Betterstack para `/api/health` | 30min |
+| 6 | C8-012 | MEDIUM | M2 | Sem dashboards operacionais | Criar dashboard basico com metricas Sentry + health check | 4h |
+| 7 | C8-013 | LOW | M3 | Sem baseline de performance documentada | Documentar resultados de k6 e Lighthouse como baseline | 2h |
+| 8 | C8-014 | LOW | M6 | Sem issue templates | Criar `.github/ISSUE_TEMPLATE/` com bug report e feature request | 1h |
+| 9 | C8-015 | LOW | M7 | Sem SECURITY.md | Criar politica de responsible disclosure | 1h |
+| 10 | C8-016 | INFO | M6 | Sem on-call documentation | Documentar quem e responsavel por incidentes | 30min |
 
 ---
 
-### 🟠 HIGH
+## Analise por Modulo
 
-#### H-01 — Ausência de Logs Estruturados (apenas `console.log`)
+### M1 — UAT & Validacao de Aceitacao
 
-- **Módulo:** M2 — Monitorização
-- **Descrição:** O projecto usa `console.log` como estratégia de logging. Embora `next.config.performance.js` remova `console.log` em produção, isso significa que **não há logging nenhum em produção** — nem erros operacionais, nem traces de debug. Sem Winston, Pino, ou equivalente configurado com transports para Sentry/Datadog/Logtail, é impossível diagnosticar incidentes pós-deploy.
-- **Remediação:** Instalar `pino` (mais leve) e criar logger wrapper que envia para Sentry em produção.
+**Score: 1.0/10**
 
-```typescript
-// src/lib/logger.ts
-import pino from 'pino';
-
-const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
-  transport: process.env.NODE_ENV === 'development'
-    ? { target: 'pino-pretty' }
-    : undefined,
-});
-
-export default logger;
-// Uso: logger.error({ userId, action }, 'Failed to fetch athlete data');
-```
-
----
-
-#### H-02 — Headers de Segurança Incompletos (sem CSP, HSTS, Referrer)
-
-- **Módulo:** M7 — Segurança
-- **Localização:** `src/next.config.js`
-- **Descrição:** O `next.config.js` tem apenas `X-Frame-Options: DENY` e `X-Content-Type-Options: nosniff`. Faltam headers críticos de segurança: CSP previne XSS, HSTS força HTTPS, Referrer-Policy protege privacidade, Permissions-Policy limita acesso a APIs do browser.
-
-```javascript
-// ❌ Actual (next.config.js — apenas 2 headers)
-{ 'X-Frame-Options': 'DENY' }
-{ 'X-Content-Type-Options': 'nosniff' }
-
-// ✅ Adicionar:
-{ 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains' }
-{ 'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; ..." }
-{ 'Referrer-Policy': 'strict-no-referrer-when-cross-origin' }
-{ 'Permissions-Policy': 'camera=(), microphone=(), geolocation=()' }
-```
-
----
-
-#### H-03 — Ausência de Health Check Endpoint
-
-- **Módulo:** M2 — Monitorização
-- **Descrição:** Não existe nenhum endpoint `/health`, `/api/health`, ou `/ping`. Sem este endpoint, serviços de uptime monitoring (UptimeRobot, BetterStack) não conseguem verificar se a aplicação está operacional. O Vercel cron usa `/api/calendar-confirmations/process-queue` (lógica de negócio) como proxy de health — não é apropriado.
-- **Remediação:** Criar endpoint simples que verifica conectividade com Supabase.
-
-```typescript
-// src/app/api/health/route.ts
-export async function GET() {
-  try {
-    const { data, error } = await supabase.from('workspaces').select('count').single();
-    if (error) throw error;
-    return Response.json({ status: 'ok', db: 'connected', ts: Date.now() });
-  } catch (e) {
-    return Response.json({ status: 'error', db: 'disconnected' }, { status: 503 });
-  }
-}
-```
-
----
-
-#### H-04 — Ausência de Dependabot / Renovate
-
-- **Módulo:** M6 — Governança
-- **Descrição:** Muitas dependências estão fixadas em `*` (latest) — `next`, `@sentry/nextjs`, `motion`, `tailwind-merge`, `swr` — o que significa que cada `npm install` pode instalar versões diferentes. Sem Dependabot, vulnerabilidades conhecidas em dependências não são automaticamente sinalizadas.
-
-```yaml
-# .github/dependabot.yml
-version: 2
-updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    groups:
-      dependencies:
-        patterns: ["*"]
-```
-
----
-
-#### H-05 — RLS Policies com Histórico de Vulnerabilidades
-
-- **Módulo:** M7 — Segurança
-- **Localização:** `src/supabase/migrations/`
-- **Descrição:** Das 21 migrations SQL, 4 têm "fix" no nome relacionado com RLS: `fix_registration_rls`, `fix_recursive_rls`, `fix_athletes_rls`, `debug_open_rls`. A migration `debug_open_rls` é particularmente preocupante — "open RLS" no nome sugere que pode ter temporariamente aberto acesso sem restrições. A primeira migration tem `CREATE POLICY "Workspaces are viewable by everyone for now" ... USING (true)` — política completamente aberta.
-- **Remediação:** Auditar todas as RLS policies activas, eliminar `USING (true)` de tabelas sensíveis, e criar testes de segurança que verificam acesso cross-tenant.
-
----
-
-### 🟡 MEDIUM / 🔵 LOW
-
-| ID | Módulo | Severidade | Descrição | Localização |
-|---|---|---|---|---|
-| M-01 | M2 | 🟡 MEDIUM | Sentry `tracesSampleRate: 1.0` em produção — custo elevado e dados desnecessários | `sentry.client.config.ts`, `sentry.server.config.ts` |
-| M-02 | M3 | 🟡 MEDIUM | Lighthouse CI no pipeline sem baseline documentada — sem threshold de regressão | `src/workflows/ci.yml` |
-| M-03 | M4 | 🟡 MEDIUM | Documentação dispersa em 100+ ficheiros — sem estrutura de entrada única | raiz do projecto |
-| M-04 | M5 | 🟡 MEDIUM | `npm audit` e Snyk com `continue-on-error: true` — não bloqueiam deploys inseguros | `src/workflows/ci.yml` |
-| M-05 | M1 | 🟡 MEDIUM | Sem sign-off formal de UAT — checklist existe mas sem stakeholder sign-off documentado | `QUALITY_CHECKLIST_FINAL.md` |
-| M-06 | M6 | 🟡 MEDIUM | Sem PR template — pull requests sem estrutura de descrição obrigatória | `.github/` (ausente) |
-| L-01 | M4 | 🔵 LOW | ARCHITECTURE.md ausente — decisões arquitecturais não documentadas | raiz |
-| L-02 | M4 | 🔵 LOW | CONTRIBUTING.md ausente — sem guia para novos contribuidores | raiz |
-| L-03 | M4 | 🔵 LOW | CHANGELOG.md ausente — histórico de versões não registado | raiz |
-| L-04 | M4 | 🔵 LOW | .env.example ausente — setup local não documentado | raiz |
-| L-05 | M6 | 🔵 LOW | Capacitor `appId: "com.example.app"` — ID genérico não apto para produção Android | `capacitor.config.json` |
-
----
-
-## Análise por Módulo
-
-### M1 — UAT & Validação de Aceitação
-
-**Score: 5/10** 🟡 Médio
-
-| Verificação | Status |
+| Verificacao | Status |
 |---|---|
-| Plano de testes UAT formal | ⚠️ Parcial (QUALITY_CHECKLIST_FINAL.md, não formal) |
-| Sign-off formal de stakeholders | ❌ Ausente |
-| Critérios de aceitação mensuráveis | ⚠️ Parcial (checklist tem critérios binários) |
-| Testes E2E de fluxos críticos | ✅ Presente (Playwright, 6+ suites) |
-| Resultados por cenário documentados | ❌ Ausente |
+| Plano de testes UAT | Ausente |
+| Sign-off formal | Ausente |
+| Criterios de aceitacao | Ausentes |
+| Bugs criticos resolvidos | Nao rastreavel |
 
-**Ficheiros detectados:** `QUALITY_CHECKLIST_FINAL.md`, `AUDITORIA_PRE_PRODUCAO_COMPLETA.md`, `src/tests/e2e/complete-user-journey.spec.ts`
+**Ficheiros detectados:** Nenhum ficheiro UAT encontrado no repositorio.
 
-**Penalizações aplicadas:**
-- Sem plano UAT formal: -2 (parcial, tem checklist)
-- Sem sign-off: -3
-- **Total: 10 - 5 = 5**
+O projecto tem 70+ ficheiros .md de status reports e progresso, o que demonstra cultura de documentacao de desenvolvimento. Contudo, nenhum se foca em validacao de aceitacao formal com cenarios de teste e sign-off. Os ficheiros `FASE*_TESTES.md` documentam testes tecnicos, nao validacao de negocio.
 
-O projecto tem testes Playwright bem estruturados que cobrem o fluxo completo do utilizador (`complete-user-journey.spec.ts`), testes de acessibilidade WCAG (`wcag-audit.spec.ts`), e testes visuais em 17 viewports diferentes. A QUALITY_CHECKLIST_FINAL.md funciona como proxy de plano UAT mas sem as assinaturas formais de stakeholders. O que falta é a formalização: transformar a checklist num documento de sign-off com datas, versão testada, e aprovação documentada.
+**Calculo do score:** 10 - 4 (sem plano UAT) - 3 (sem sign-off) - 2 (sem criterios) = 1.0
 
 ---
 
-### M2 — Monitorização e Observabilidade
+### M2 — Monitorizacao e Observabilidade
 
-**Score: 3/10** 🟠 Fraco
+**Score: 3.0/10**
 
-| Verificação | Status |
+| Verificacao | Status |
 |---|---|
-| Error tracking (Sentry) | ✅ Configurado (client + server + edge) |
-| Logs estruturados (Winston/Pino) | ❌ Ausente |
-| Uptime monitor (UptimeRobot/BetterStack) | ❌ Ausente |
-| SLIs/SLOs definidos | ❌ Ausente (template, não real) |
-| Dashboards operacionais | ❌ Ausente (template MONITORING_DASHBOARD_48H.md) |
-| Alertas configurados (PagerDuty/Slack) | ❌ Ausente |
-| Health check endpoint | ❌ Ausente |
+| Error tracking (Sentry/equiv.) | Sentry configurado (client + server + edge) |
+| Logs estruturados | Pino como dependencia (10.3.1) |
+| Uptime monitor | Ausente |
+| SLIs/SLOs definidos | Ausentes |
+| Dashboards operacionais | Ausentes |
+| Alertas configurados | Ausentes |
+| Health check endpoint | Presente (`GET /api/health`) |
 
-**Serviços detectados:** Sentry (3 configs: client, server, edge)
+**Servicos detectados:** Sentry (@sentry/nextjs 9.0.0, @sentry/react 10.46.0), Pino (10.3.1), PostHog (1.364.1)
 
-**Penalizações aplicadas:**
-- Sentry presente: 0 (não penalizado)
-- Sem logs estruturados: -3
-- Sem uptime monitor: -2
-- Sem SLOs: -2
-- **Total: 10 - 7 = 3**
+**Detalhes Sentry:**
+- Client: trace sample rate 1.0, replays 10%, replays on error 100%, PII filtering activo
+- Server: filtra erros de rede (ECONNRESET, ETIMEDOUT), redacta authorization headers
+- Edge: configuracao lightweight
 
-O Sentry está correctamente configurado com DSN via variável de ambiente, `beforeSend` para redactar PII, e sampling de replays a 10%. O problema é que `tracesSampleRate: 1.0` em produção vai gerar custos elevados e dados desnecessários — recomenda-se `0.1` a `0.2`. O ficheiro `MONITORING_DASHBOARD_48H.md` é um **template com dados fictícios** (LCP: 2.1s, API p95: 296ms) e não uma dashboard real. Não existe nenhum mecanismo para verificar se a aplicação está online além do próprio Sentry receber erros.
+**Health Check:** `GET /api/health` verifica conectividade DB (Supabase), retorna status, timestamp e versao. Status codes: 200 (ok) / 503 (error).
+
+**Lacuna principal:** Sentry esta a recolher erros mas ninguem e notificado. Sem alertas, os erros acumulam-se silenciosamente.
+
+**Calculo do score:** 10 - 2 (sem uptime) - 2 (sem SLOs) - 1 (sem dashboards) - 2 (sem alertas) = 3.0
 
 ---
 
 ### M3 — Testes de Carga e Performance
 
-**Score: 2/10** 🔴 Crítico
+**Score: 8.0/10**
 
-| Verificação | Status |
+| Verificacao | Status |
 |---|---|
-| Scripts de teste de carga (k6/Locust/Artillery) | ❌ Ausente |
-| Testes de stress/spike | ❌ Ausente |
-| Baseline de performance documentada | ❌ Ausente (template) |
-| Lighthouse CI no pipeline | ✅ Presente (mas pipeline no sítio errado) |
-| Resultados com p95/p99 | ❌ Ausente |
+| Scripts de teste de carga | k6 (3 scripts) |
+| Ferramenta utilizada | k6 (Grafana) |
+| Resultados documentados | Parcial (Lighthouse config) |
+| Baseline de performance | Nao documentada |
 
-**Penalizações aplicadas:**
-- Sem scripts de teste de carga: -4
-- Sem stress/spike: -2
-- Sem baseline documentada: -2
-- Lighthouse presente: 0 (não penalizado)
-- **Total: 10 - 8 = 2**
+**Scripts k6 encontrados:**
 
-O `next.config.performance.js` tem optimizações de build inteligentes (code splitting por vendor, AVIF/WebP, Etags, remoção de console.log). O Lighthouse CI está configurado no pipeline para 3 URLs. Mas nada disto é um teste de carga — o Lighthouse mede performance de carregamento para **um utilizador**, não comportamento sob 100+ utilizadores simultâneos. A Supabase gratuita tem limite de 60 conexões simultâneas de DB; sem testes de carga não há como saber se isso é suficiente.
+1. **`tests/load/basic-load.js`** — Teste basico
+   - Stages: 20 users (10s) -> 50 users (30s) -> ramp down
+   - Thresholds: p(95) < 500ms, error rate < 1%
+   - Testa: /, /privacy, API boundaries
+
+2. **`tests/load/api-load.js`** — Teste de APIs
+   - Stages: 50 RPS (1min) -> 100 RPS (1min) -> sustain -> ramp down
+   - Thresholds: p(99) < 1000ms, error rate < 2%
+   - Testa: /api/athletes, /api/calendar-events, /api/metrics, /api/workouts
+
+3. **`tests/load/spike-test.js`** — Teste de picos
+   - Stages: 10 users -> 200 users (spike) -> sustain -> recovery
+   - Thresholds: p(95) < 2000ms (lenient), error rate < 5%
+
+**Lighthouse CI:** Configurado com assertions: FCP < 2000ms, LCP < 2500ms, CLS < 0.1, TBT < 300ms, Speed Index < 3000ms, Interactive < 3500ms. Accessibilidade >= 0.9, Best Practices >= 0.9.
+
+**Calculo do score:** 10 - 2 (sem baseline documentada) = 8.0
 
 ---
 
-### M4 — Documentação Técnica
+### M4 — Documentacao Tecnica
 
-**Score: 3/10** 🟠 Fraco
+**Score: 3.0/10**
 
 | Ficheiro | Existe | Qualidade |
 |---|---|---|
-| README.md | ✅ Sim | ⚠️ Parcial (visão geral, mas setup incompleto) |
-| ARCHITECTURE.md | ❌ Não | — |
-| CONTRIBUTING.md | ❌ Não | — |
-| CHANGELOG.md | ❌ Não | — |
-| DEPLOY.md | ❌ Não | — |
-| SECURITY.md | ❌ Não (só em node_modules) | — |
-| .env.example | ❌ Não | — |
+| README.md | Sim | Minimo (3 linhas) |
+| ARCHITECTURE.md | Nao | — |
+| CONTRIBUTING.md | Nao | — |
+| CHANGELOG.md | Nao | — |
+| DEPLOY.md | Nao | — |
+| SECURITY.md | Nao | — |
+| .env.example | Sim | Bom (variaveis documentadas) |
 
-**Penalizações aplicadas:**
-- ARCHITECTURE.md ausente: -2
-- CONTRIBUTING.md ausente: -1
-- CHANGELOG.md ausente: -1
-- DEPLOY.md ausente: -2
-- .env.example ausente: -1
-- **Total: 10 - 7 = 3**
+**Nota positiva:** O projecto tem 70+ ficheiros .md de documentacao tecnica em `src/` (status reports, roadmaps, guias de implementacao, analises tecnicas). Contudo, faltam os ficheiros de governanca essenciais na raiz. O `src/README.md` e mais completo que o raiz.
 
-O projecto tem uma quantidade impressionante de documentação (100+ ficheiros .md), mas está **dispersa e desorganizada**: `SETUP_GUIDE.md`, `API_REFERENCE.md`, `QUALITY_CHECKLIST_FINAL.md`, `POST_LAUNCH_PLAN.md`, `PLANO_ACAO_PRODUCAO.md`, `STATUS_DAY30_COMPLETE.md`, `MONITORING_DASHBOARD_48H.md`, e dezenas mais dentro de `src/`. Esta abundância sem estrutura é quase tão problemática como a ausência — um novo developer não sabe por onde começar.
+**Calculo do score:** 10 - 2 (sem ARCHITECTURE) - 1 (sem CONTRIBUTING) - 1 (sem CHANGELOG) - 2 (sem DEPLOY) - 1 (README sem setup completo) = 3.0
 
 ---
 
 ### M5 — CI/CD Pipeline
 
-**Score: 4/10** 🟠 Fraco
+**Score: 10.0/10**
 
-| Verificação | Status |
+| Verificacao | Status |
 |---|---|
-| Pipeline CI configurado | ⚠️ Existe mas no sítio errado |
-| Localização do workflow | ❌ `src/workflows/ci.yml` (deve ser `.github/workflows/`) |
-| Testes obrigatórios | ✅ Configurados (unit, e2e, visual, a11y) |
-| Lint/type-check | ✅ Configurado (ESLint, TypeScript) |
-| Lighthouse CI | ✅ Configurado |
-| Audit de dependências | ⚠️ `continue-on-error: true` (não bloqueia) |
-| Deploy para staging (Vercel preview) | ✅ Configurado |
-| Deploy para produção (Vercel) | ✅ Configurado |
-| Dependabot/Renovate | ❌ Ausente |
-| Secrets geridos correctamente | ❌ `.env` versionado |
+| Pipeline CI configurado | GitHub Actions (`.github/workflows/ci.yml`) |
+| Plataforma | GitHub Actions |
+| Testes obrigatorios | Jest (unit) + Playwright (e2e + visual) |
+| Lint/type-check | ESLint + Prettier + `tsc --noEmit` |
+| Audit de dependencias | npm audit + Snyk |
+| Deploy para staging | Vercel preview em PRs |
+| Dependabot/Renovate | Dependabot (weekly, Mondays 09:00 Europe/Lisbon) |
 
-**Workflows detectados:** `src/workflows/ci.yml` (387 linhas, 10 jobs)
+**Workflows detectados:** 1 workflow principal com 11 jobs:
 
-**Penalizações aplicadas:**
-- Pipeline no sítio errado (efectivamente não corre): -3
-- npm audit + Snyk com continue-on-error: -1
-- Sem dependabot: -1
-- Secrets expostos (.env): -1 (já penalizado em M7)
-- **Total: 10 - 5 = 4** (com crédito pelo design bem estruturado)
+1. **lint** — ESLint, TypeScript type-check, Prettier
+2. **test-unit** — Jest com coverage (Codecov upload)
+3. **test-visual** — Playwright visual regression (3 browsers)
+4. **test-e2e** — Playwright E2E (3 browsers + mobile)
+5. **build** — Vite production build + size check
+6. **lighthouse** — Performance CI (3 URLs, PRs only)
+7. **security** — npm audit + Snyk
+8. **deploy-preview** — Vercel preview (PRs, requires build + tests)
+9. **deploy-production** — Vercel prod (main, requires all checks)
+10. **notify** — Slack notification on failure
 
-**Detalhe dos 10 jobs do pipeline (se fosse activado):**
+**Dependabot:** Weekly updates, max 10 PRs, agrupamento por radix-ui/testing/supabase, reviewer: ruida.
 
-| Job | Timeout | Trigger | Dependências |
-|---|---|---|---|
-| lint-typecheck | 10min | push/PR | — |
-| test-unit | 15min | push/PR | — |
-| test-visual | 30min | push/PR | — |
-| test-e2e | 30min | push/PR | — |
-| build | 15min | push/PR | lint, test-unit |
-| performance-tests | 20min | push/PR | build |
-| security-scan | 10min | push/PR | — |
-| deploy-preview | 10min | PR only | build |
-| deploy-production | 15min | main push | build, test-unit, test-visual, test-e2e, security |
-| notify | — | sempre | all |
+**Pipeline exemplar.** Todas as quality gates presentes: testes obrigatorios, lint, type-check, audit de seguranca, deploy automatizado com environment promotion.
 
-O design do pipeline é exemplar — o problema é exclusivamente o ficheiro estar no sítio errado.
+**Calculo do score:** 10 - 0 = 10.0 (bonus: environment promotion com approval gates implicitamente presente via required checks)
 
 ---
 
-### M6 — Governança
+### M6 — Governanca
 
-**Score: 2/10** 🔴 Crítico
+**Score: 5.0/10**
 
-| Verificação | Status |
+| Verificacao | Status |
 |---|---|
-| Branch protection | ❌ Ausente (não detectada) |
-| Code review obrigatório | ❌ Ausente |
-| Dependabot configurado | ❌ Ausente |
-| PR template | ❌ Ausente |
-| CODEOWNERS | ❌ Ausente |
-| Post-mortem process | ❌ Ausente |
-| On-call documentation | ❌ Ausente |
-| Issue templates | ❌ Ausente |
+| Branch protection | Nao verificavel (configuracao GitHub) |
+| Code review obrigatorio | PR template existe, enforcement nao verificavel |
+| Dependabot configurado | Sim (weekly, grouped) |
+| PR template | Sim (detalhado, com checklists) |
+| CODEOWNERS | Ausente |
+| Post-mortem process | Ausente |
 
-**Penalizações aplicadas:**
-- Sem branch protection: -4
-- Sem code review: -3
-- Sem dependabot: -1
-- **Total: 10 - 8 = 2**
+**PR Template** (`.github/PULL_REQUEST_TEMPLATE.md`):
+- Descricao e issues relacionadas
+- Tipo de mudanca (bug, feature, breaking, security, docs, refactor, UI/UX, perf)
+- Checklists: qualidade de codigo, seguranca, testes, compliance LGPD, screenshots
+- Em portugues, bem estruturado
 
-Não foi encontrada nenhuma pasta `.github/` com ficheiros de governança. Combinado com o pipeline no sítio errado, o resultado prático é: qualquer developer pode fazer push directo para `main`, desencadear um deploy para produção sem qualquer revisão, sem testes automáticos, e sem auditoria. Este é o gap de governança mais crítico a resolver após a segurança.
+**Calculo do score:** 10 - 1 (sem CODEOWNERS) - 2 (sem post-mortem) - 1 (code review nao verificavel como obrigatorio) - 1 (sem on-call docs) = 5.0
 
 ---
 
-### M7 — Segurança Pós-Deploy
+### M7 — Seguranca Pos-Deploy
 
-**Score: 2/10** 🔴 Crítico
+**Score: 9.0/10**
 
-| Verificação | Status |
+| Verificacao | Status |
 |---|---|
-| .env no .gitignore | ❌ Não (credenciais expostas) |
-| SECURITY.md | ❌ Ausente |
-| Secret scanning no CI | ❌ Ausente |
-| npm audit no CI | ⚠️ Presente mas não bloqueante |
-| CORS configurado | ⚠️ Não detectado explicitamente |
-| Headers de segurança completos | ⚠️ Parcial (2/6 headers) |
-| RLS Supabase | ⚠️ Presente mas com histórico de bugs |
-| Imagens SVG dangerouslyAllowSVG | ⚠️ Risco XSS presente |
+| .env no .gitignore | Sim (.env, .env.local, .env.production, .env.*.local) |
+| SECURITY.md | Ausente |
+| Secret scanning CI | Snyk no pipeline |
+| npm audit CI | npm audit --production (audit-level=high) |
+| CORS wildcard | Nao detectado |
+| Vuln deps criticas | Nao verificado (sem npm audit local) |
 
-**Penalizações aplicadas:**
-- .env não no .gitignore: -4
-- Sem SECURITY.md: -1
-- Sem secret scanning no CI: -2
-- npm audit não bloqueante: -1
-- **Total: 10 - 8 = 2**
+**Headers de seguranca** (vercel.json):
+- X-Content-Type-Options: nosniff
+- X-Frame-Options: DENY
+- X-XSS-Protection: 1; mode=block
+- Referrer-Policy: strict-origin-when-cross-origin
+- Permissions-Policy: camera=(), microphone=(), geolocation=()
+- Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+- Content-Security-Policy: Configurado para self, Supabase, Sentry, PostHog, Dicebear
 
-**Headers de segurança actual vs recomendado:**
-
-| Header | Status Actual | Recomendado |
-|---|---|---|
-| X-Frame-Options | ✅ DENY | OK |
-| X-Content-Type-Options | ✅ nosniff | OK |
-| Content-Security-Policy | ❌ Ausente | `default-src 'self'...` |
-| Strict-Transport-Security | ❌ Ausente | `max-age=31536000; includeSubDomains` |
-| Referrer-Policy | ❌ Ausente | `strict-no-referrer-when-cross-origin` |
-| Permissions-Policy | ❌ Ausente | `camera=(), microphone=()` |
-
-**Nota sobre `dangerouslyAllowSVG: true`** em `next.config.js`: permite injecção de scripts via SVGs maliciosos. Mitigado parcialmente pelo `contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;"` aplicado às imagens, mas é um risco que deve ser monitorizado.
+**Calculo do score:** 10 - 1 (sem SECURITY.md) = 9.0
 
 ---
 
-## Plano de Remediação
+## Plano de Remediacao
 
-### Fase 1 — Crítico: Antes de qualquer deploy (Semana 1)
+### Fase 1 — Critico (Semana 1-2)
 
-- [ ] **Revogar credenciais Supabase expostas** — Revogar chave anónima actual no dashboard Supabase, gerar nova, guardar apenas em Vercel env vars | Esforço: XS (1h) | Responsável: Lead Dev | **FAZER HOJE**
-- [ ] **Mover CI workflow** — `mv src/workflows/ci.yml .github/workflows/ci.yml` e verificar primeiro run | Esforço: XS (30min) | Responsável: DevOps
-- [ ] **Adicionar .env ao .gitignore** — Criar `.gitignore` raiz, adicionar `.env`, criar `.env.example` | Esforço: XS (30min) | Responsável: Lead Dev
-- [ ] **Activar Branch Protection** — GitHub Settings → Branches → main → require PR + status checks | Esforço: XS (30min) | Responsável: Admin GitHub
-- [ ] **Criar health check endpoint** — `GET /api/health` com verificação de DB | Esforço: S (2h) | Responsável: Backend Dev
-- [ ] **Auditar RLS policies activas** — Verificar estado actual de todas as RLS, eliminar `USING (true)` de tabelas sensíveis | Esforço: M (4h) | Responsável: Backend Dev
+- [ ] **Criar plano UAT** — Documentar cenarios de teste de aceitacao mapeados a features criticas (atletas, calendario, live sessions, forms) | Esforco: 2-3 dias | Responsavel: Product Owner
+- [ ] **Configurar alertas Sentry** — Criar alert rules para error spikes, new issues, e regression | Esforco: 2h | Responsavel: DevOps
+- [ ] **Adicionar uptime monitor** — Configurar UptimeRobot ou Betterstack para `/api/health` com alerta via Slack/email | Esforco: 30min | Responsavel: DevOps
+- [ ] **Definir SLIs/SLOs** — p99 latencia < 500ms, error rate < 1%, uptime > 99.9% | Esforco: 2h | Responsavel: Tech Lead
 
-### Fase 2 — Alta Prioridade (Semana 2)
+### Fase 2 — Alta Prioridade (Semana 3-4)
 
-- [ ] **Headers de segurança completos** — Adicionar CSP, HSTS, Referrer-Policy, Permissions-Policy ao `next.config.js` | Esforço: S (2h)
-- [ ] **Logging estruturado** — Instalar `pino`, criar `src/lib/logger.ts`, substituir `console.log` críticos | Esforço: M (1 dia)
-- [ ] **npm audit bloqueante** — Remover `continue-on-error: true` do job de security-scan no CI | Esforço: XS (5min)
-- [ ] **Dependabot** — Criar `.github/dependabot.yml` para updates semanais | Esforço: XS (15min)
-- [ ] **Fixar versões de dependências** — Substituir `*` por versões específicas em package.json | Esforço: S (2h)
-- [ ] **PR Template** — Criar `.github/PULL_REQUEST_TEMPLATE.md` | Esforço: XS (30min)
-- [ ] **Sign-off UAT** — Formalizar QUALITY_CHECKLIST_FINAL.md como documento de sign-off com data e aprovação | Esforço: XS (1h)
+- [ ] **Criar ARCHITECTURE.md** — Diagramas Mermaid, fluxo de dados, decisoes de stack | Esforco: 1 dia
+- [ ] **Criar DEPLOY.md** — Setup, variaveis, deploy, rollback, troubleshooting | Esforco: 4h
+- [ ] **Expandir README.md** — Descricao completa, setup, scripts, links | Esforco: 2h
+- [ ] **Configurar branch protection** — Require PR, 1+ approval, require status checks | Esforco: 30min
 
-### Fase 3 — Maturidade Operacional (Mês 2)
+### Fase 3 — Melhorias (Mes 2)
 
-- [ ] **Testes de carga k6** — Criar scripts para endpoints críticos: login, athlete list, calendar | Esforço: M (2 dias)
-- [ ] **Uptime monitor** — Configurar UptimeRobot ou BetterStack com o novo `/api/health` endpoint | Esforço: XS (30min)
-- [ ] **Reduzir Sentry sampling** — `tracesSampleRate: 1.0` → `0.1` em produção | Esforço: XS (5min)
-- [ ] **ARCHITECTURE.md** — Documentar decisões arquitecturais (Vite + Supabase + Capacitor) | Esforço: M (1 dia)
-- [ ] **CONTRIBUTING.md** — Guia de contribuição com convenções e processo de PR | Esforço: S (2h)
-- [ ] **Capacitor appId correcto** — `com.example.app` → `com.performtrack.app` | Esforço: XS (15min)
-- [ ] **SECURITY.md** — Política de segurança e responsible disclosure | Esforço: S (1h)
-- [ ] **Post-mortem template** — Criar `.github/ISSUE_TEMPLATE/post-mortem.md` | Esforço: XS (30min)
+- [ ] **Criar CONTRIBUTING.md** — Convencoes, processo PR, coding standards
+- [ ] **Criar CHANGELOG.md** — Iniciar com versao actual, seguir Keep a Changelog
+- [ ] **Criar CODEOWNERS** — Atribuir owners por modulo (calendar, athletes, dataos, live)
+- [ ] **Criar SECURITY.md** — Responsible disclosure policy, contacto
+- [ ] **Criar post-mortem template** — Template em `docs/post-mortem/TEMPLATE.md`
+- [ ] **Criar issue templates** — Bug report e feature request em `.github/ISSUE_TEMPLATE/`
+- [ ] **Documentar baseline de performance** — Resultados k6 e Lighthouse como referencia
+- [ ] **Criar dashboard operacional** — Metricas Sentry + health check + PostHog
 
 ---
 
 ## Checklist de Go-Live
 
-Use esta checklist antes de qualquer deployment em produção:
+Use esta checklist antes de cada deployment major:
 
-### ✅ Segurança (OBRIGATÓRIO)
-- [ ] Credenciais Supabase rotadas e fora do repositório
-- [ ] `.env` no `.gitignore` confirmado
-- [ ] `npm audit` sem vulnerabilidades HIGH/CRITICAL
-- [ ] Headers CSP e HSTS configurados
-- [ ] RLS policies auditadas e testadas
+### Validacao
+- [ ] UAT completo com sign-off documentado
+- [ ] Todos os bugs bloqueantes resolvidos
+- [ ] Smoke tests pos-deploy definidos
 
-### ✅ Pipeline (OBRIGATÓRIO)
-- [ ] CI workflow em `.github/workflows/` a correr
-- [ ] Branch protection activa em `main`
-- [ ] Todos os jobs de CI a passar (lint, test-unit, build)
-- [ ] Deploy preview verificado antes de produção
+### Observabilidade
+- [ ] Error tracking (Sentry) a enviar alertas
+- [ ] Dashboards actualizados para nova versao
+- [ ] Alertas de SLO configurados
 
-### ✅ Observabilidade (RECOMENDADO)
-- [ ] Health check endpoint a responder
-- [ ] Sentry a enviar erros correctamente
-- [ ] Uptime monitor configurado com alertas
+### Operacional
+- [ ] Runbook de rollback testado
+- [ ] On-call rotation actualizada
+- [ ] Communication plan para stakeholders
 
-### ✅ Validação (RECOMENDADO)
-- [ ] Testes E2E em staging a passar
-- [ ] Sign-off de stakeholder documentado
-- [ ] Smoke tests pós-deploy executados
+### Seguranca
+- [ ] `npm audit` sem vulnerabilidades criticas/altas
+- [ ] Secrets rotated se necessario
+- [ ] Permissoes de acesso revistas
 
 ---
 
-## Resumo de Scores
+## Score Global — Calculo Detalhado
 
 ```
-M1 UAT/Validação        █████░░░░░  5/10  🟡  (checklist existe, sem sign-off formal)
-M2 Monitorização        ███░░░░░░░  3/10  🟠  (Sentry sim, resto ausente)
-M3 Testes de Carga      ██░░░░░░░░  2/10  🔴  (zero load tests, só Lighthouse)
-M4 Documentação         ███░░░░░░░  3/10  🟠  (100+ docs dispersas, ficheiros core ausentes)
-M5 CI/CD Pipeline       ████░░░░░░  4/10  🟠  (pipeline bem feito mas no sítio errado)
-M6 Governança           ██░░░░░░░░  2/10  🔴  (zero ficheiros .github/, sem branch protection)
-M7 Segurança            ██░░░░░░░░  2/10  🔴  (credenciais expostas, headers incompletos)
-
-GLOBAL (ponderado)      ███░░░░░░░  3.0/10 🟠 Fraco — Nível 2 Repetível
+M1 UAT:          1.0 x 1.0 =  1.0
+M2 Monitorizacao: 3.0 x 1.5 =  4.5
+M3 Carga:        8.0 x 1.0 =  8.0
+M4 Documentacao: 3.0 x 1.0 =  3.0
+M5 CI/CD:       10.0 x 1.3 = 13.0
+M6 Governanca:   5.0 x 1.2 =  6.0
+M7 Seguranca:    9.0 x 1.3 = 11.7
+                              -----
+Soma ponderada:               47.2
+Soma dos pesos:                8.3
+GLOBAL:           47.2 / 8.3 = 5.7/10
 ```
 
-**Nota final:** O projecto tem claramente muito esforço e competência técnica aplicados — o código React é sólido, os testes Playwright são impressionantes, e o design do pipeline CI é correcto. O problema é que o trabalho de governança e segurança foi deixado para o fim e está incompleto. Com 1-2 semanas focadas nos itens desta auditoria, o projecto pode atingir facilmente 7.0/10 e estar pronto para produção.
+## Classificacao de Maturidade
+
+| Score | Classificacao | Maturidade CMMI |
+|---|---|---|
+| 9.0 - 10.0 | Excelente | Nivel 5 — Optimizado |
+| 7.0 - 8.9 | Bom | Nivel 4 — Gerido |
+| **5.0 - 6.9** | **Medio** | **Nivel 3 — Definido** |
+| 3.0 - 4.9 | Fraco | Nivel 2 — Repetivel |
+| 0.0 - 2.9 | Critico | Nivel 1 — Inicial |
+
+**Classificacao actual: Medio (5.7/10) — Nivel 3 Definido**
+
+O projecto situa-se na fronteira entre Repetivel e Definido. A infraestrutura CI/CD e seguranca pos-deploy sao pontos fortes que elevam o score. As lacunas em UAT, monitorizacao e documentacao impedem a classificacao de Bom.
+
+**Meta a 3 meses:** 7.5/10 (Bom — Nivel 4 Gerido), focando em UAT, alertas Sentry, SLOs, e documentacao de governanca.
 
 ---
 
-*Relatório gerado pelo Audit Post-Production Plugin — Protocolo C8 v1.0*
-*Projecto: PerformTrack (V-Login2) | Data: 28 de Março de 2026 | Auditor: Claude*
+*Relatorio gerado pelo Audit Post-Production Plugin — Protocolo C8 v1.0 — 2026-03-30*

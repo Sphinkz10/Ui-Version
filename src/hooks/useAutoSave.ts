@@ -26,7 +26,7 @@ export function useAutoSave<T>({ data, key, delay = 2000, onSave }: UseAutoSaveO
     // Set new timeout for auto-save
     timeoutRef.current = setTimeout(() => {
       try {
-        localStorage.setItem(key, JSON.stringify(data));
+        sessionStorage.setItem(key, JSON.stringify(data));
         onSave?.(data);
         console.log(`Auto-saved: ${key}`);
       } catch (error) {
@@ -42,10 +42,10 @@ export function useAutoSave<T>({ data, key, delay = 2000, onSave }: UseAutoSaveO
   }, [data, key, delay, onSave]);
 }
 
-// Load saved data from localStorage
+// Load saved data from sessionStorage
 export function useLoadSavedData<T>(key: string, defaultValue: T): T {
   try {
-    const saved = localStorage.getItem(key);
+    const saved = sessionStorage.getItem(key);
     if (saved) {
       return JSON.parse(saved) as T;
     }
@@ -58,7 +58,7 @@ export function useLoadSavedData<T>(key: string, defaultValue: T): T {
 // Clear saved data
 export function clearSavedData(key: string) {
   try {
-    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
     console.log(`Cleared saved data: ${key}`);
   } catch (error) {
     console.error("Failed to clear saved data:", error);

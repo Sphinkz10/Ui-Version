@@ -64,14 +64,14 @@ export function HealthTab({ athleteId }: HealthTabProps) {
   // ✅ NEW DAY 6: Handle injury creation
   const handleCreateInjury = async (data: InjuryFormData) => {
     // TODO: Replace with actual API call
-    console.log('Creating injury:', data);
+    // console.log removed to prevent PII leak (LGPD/GDPR)
     await new Promise(resolve => setTimeout(resolve, 500));
   };
 
   // ✅ NEW DAY 6: Handle injury edit
   const handleEditInjury = async (data: InjuryFormData) => {
     // TODO: Replace with actual API call
-    console.log('Editing injury:', data);
+    // console.log removed to prevent PII leak (LGPD/GDPR)
     await new Promise(resolve => setTimeout(resolve, 500));
   };
 

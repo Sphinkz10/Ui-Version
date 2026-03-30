@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Bell, MessageSquare, User, ChevronDown, Plus, Settings, Brain, LogOut } from "lucide-react";
+import { Search, MessageSquare, ChevronDown, Settings, Brain, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { NotificationBell } from "../notifications/NotificationBell";
 import { useMessages } from "../../hooks/useMessages";
@@ -46,6 +46,8 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="relative flex items-center gap-2">
             <motion.button
+              aria-label="Abrir menu do utilizador"
+              aria-expanded={userMenuOpen}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -238,6 +240,7 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
         {/* Actions */}
         <div className="flex items-center gap-2">
           <motion.button
+            aria-label="Pesquisar"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onSearchOpen}
@@ -272,6 +275,7 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
           />
 
           <motion.button
+            aria-label="Ver mensagens"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onMessagesOpen}
@@ -284,6 +288,7 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
           </motion.button>
 
           <motion.button
+            aria-label="Configurações gerais"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {

@@ -57,6 +57,7 @@ interface SmartQuestion {
   color: string;
   reportType: string;
   popular?: boolean;
+  estimatedTime?: string;
 }
 
 interface QuickReport {
@@ -467,8 +468,12 @@ export function ReportBuilderV2() {
   // ===== HOME VIEW =====
   if (viewMode === "home") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white pb-20 sm:pb-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5">
+      <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-50 via-slate-50 to-emerald-50/30 pb-20 sm:pb-0 relative overflow-hidden">
+        {/* Abstract Background Orbs for Deep Glassmorphism Effect */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5 relative z-10">
           
           {/* Breadcrumbs */}
           <Breadcrumbs items={[
@@ -523,7 +528,7 @@ export function ReportBuilderV2() {
                 placeholder="Ex: 'progressão do João' ou 'comparar atletas'..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 text-base border-2 border-slate-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-300 transition-all shadow-sm hover:shadow-md"
+                className="w-full pl-12 pr-4 py-4 text-base border border-white/60 bg-white/60 backdrop-blur-xl rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-300 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:bg-white/80 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
               />
               {searchQuery && (
                 <motion.button
@@ -580,8 +585,11 @@ export function ReportBuilderV2() {
                     transition={{ delay: 0.6 + index * 0.05 }}
                     whileHover={{ scale: 1.02 }}
                     onClick={() => setShowGamification(true)}
-                    className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white to-slate-50/50 p-4 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                    className="relative overflow-hidden rounded-2xl border border-white/60 bg-white/70 backdrop-blur-xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:bg-white/90 transition-all cursor-pointer"
                   >
+                    <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                      <Icon className="h-16 w-16" />
+                    </div>
                     <div className="flex items-center gap-2 mb-2">
                       <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${colorClasses} flex items-center justify-center`}>
                         <Icon className="h-4 w-4 text-white" />
@@ -614,10 +622,10 @@ export function ReportBuilderV2() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setInteractionMode(mode.id)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-xl transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl transition-all whitespace-nowrap backdrop-blur-md ${
                     interactionMode === mode.id
-                      ? "bg-gradient-to-r from-sky-500 to-sky-600 text-white shadow-lg shadow-sky-500/30"
-                      : "bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-300"
+                      ? "bg-gradient-to-r from-sky-500 to-sky-600 text-white shadow-lg shadow-sky-500/30 border-transparent"
+                      : "bg-white/60 border border-white/50 text-slate-700 hover:bg-white/90 hover:shadow-sm"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -713,7 +721,7 @@ export function ReportBuilderV2() {
                       violet: { bg: "from-violet-500 to-violet-600", border: "border-violet-200", hover: "hover:border-violet-400" },
                       amber: { bg: "from-amber-500 to-amber-600", border: "border-amber-200", hover: "hover:border-amber-400" },
                       red: { bg: "from-red-500 to-red-600", border: "border-red-200", hover: "hover:border-red-400" }
-                    }[q.color];
+                    }[q.color] || { bg: "from-slate-500 to-slate-600", border: "border-slate-200", hover: "hover:border-slate-400" };
 
                     return (
                       <motion.button
@@ -724,7 +732,7 @@ export function ReportBuilderV2() {
                         whileHover={{ scale: 1.02, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleQuestionClick(q)}
-                        className={`group p-4 rounded-2xl border-2 ${colorClasses.border} bg-gradient-to-br from-white to-slate-50/50 ${colorClasses.hover} hover:shadow-xl transition-all text-left relative overflow-hidden`}
+                        className={`group p-4 rounded-2xl border border-white/60 bg-white/60 backdrop-blur-xl hover:bg-white/90 shadow-[0_4px_20px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all text-left relative overflow-hidden`}
                       >
                         {q.popular && (
                           <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold flex items-center gap-1">
@@ -763,7 +771,10 @@ export function ReportBuilderV2() {
             {/* MODO PROFUNDO - Deep Analysis */}
             {interactionMode === "deep" && (
               <div className="space-y-4">
-                <div className="p-6 rounded-2xl border-2 border-sky-200 bg-gradient-to-br from-sky-50 to-white">
+                <div className="p-6 rounded-2xl border border-white/60 bg-white/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
+                  <div className="absolute -right-4 -top-4 opacity-5 pointer-events-none">
+                    <Brain className="h-48 w-48 text-sky-600" />
+                  </div>
                   <div className="flex items-start gap-4 mb-6">
                     <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center shrink-0">
                       <Brain className="h-7 w-7 text-white" />
@@ -809,7 +820,7 @@ export function ReportBuilderV2() {
                         emerald: { bg: "from-emerald-500 to-emerald-600", border: "border-emerald-200" },
                         violet: { bg: "from-violet-500 to-violet-600", border: "border-violet-200" },
                         red: { bg: "from-red-500 to-red-600", border: "border-red-200" }
-                      }[item.color];
+                      }[item.color] || { bg: "from-slate-500 to-slate-600", border: "border-slate-200" };
 
                       return (
                         <motion.button
@@ -854,7 +865,10 @@ export function ReportBuilderV2() {
             {/* MODO HISTÓRIA - Storytelling */}
             {interactionMode === "story" && (
               <div className="space-y-4">
-                <div className="p-6 rounded-2xl border-2 border-violet-200 bg-gradient-to-br from-violet-50 to-white">
+                <div className="p-6 rounded-2xl border border-white/60 bg-white/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
+                  <div className="absolute -right-4 -top-4 opacity-5 pointer-events-none">
+                    <MessageCircle className="h-48 w-48 text-violet-600" />
+                  </div>
                   <div className="flex items-start gap-4 mb-6">
                     <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center shrink-0">
                       <MessageCircle className="h-7 w-7 text-white" />
@@ -976,7 +990,7 @@ export function ReportBuilderV2() {
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleQuickReport(report)}
-                    className="p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-300 hover:shadow-lg transition-all text-left group"
+                    className="p-4 rounded-2xl border border-white/60 bg-white/60 backdrop-blur-xl hover:bg-white/90 hover:border-sky-300 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all text-left group"
                   >
                     <div className="flex flex-col gap-3">
                       <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${colorClasses} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-md`}>

@@ -55,6 +55,7 @@ export default defineConfig({
   build: {
     target: 'esnext',
     outDir: 'build',
+    sourcemap: false,
   },
   server: {
     port: 3000,
@@ -65,6 +66,8 @@ export default defineConfig({
       'X-Frame-Options': 'DENY',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://eu.posthog.com https://browser.sentry-cdn.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://eu.posthog.com https://*.sentry.io; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:;",
     },
   },
 });

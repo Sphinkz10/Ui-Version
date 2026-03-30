@@ -49,51 +49,19 @@ interface RegisterData {
   coachId?: string;
 }
 
-// SEC-003 FIX: Demo credentials moved to environment variables
-// Never hardcode passwords in source code
-const MOCK_USERS = {
-  [import.meta.env.VITE_DEMO_COACH_EMAIL || 'coach@demo.com']: {
-    id: 'coach-1',
-    name: 'João Silva',
-    email: import.meta.env.VITE_DEMO_COACH_EMAIL || 'coach@demo.com',
-    role: 'coach' as const,
-    password: import.meta.env.VITE_DEMO_COACH_PASS || '',
-    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=coach1',
-    workspaceId: 'workspace-1',
-  },
-  [import.meta.env.VITE_DEMO_ATHLETE_EMAIL || 'atleta@demo.com']: {
-    id: 'athlete-1',
-    name: 'Maria Santos',
-    email: import.meta.env.VITE_DEMO_ATHLETE_EMAIL || 'atleta@demo.com',
-    role: 'athlete' as const,
-    password: import.meta.env.VITE_DEMO_ATHLETE_PASS || '',
-    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=athlete1',
-    workspaceId: 'workspace-1',
-  },
-};
-
-const MOCK_WORKSPACE: Workspace = {
-  id: 'workspace-1',
-  name: 'Academia Premium',
-  type: 'gym',
-};
 
 export function AppProvider({ children }: AppProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [useMockAuth, setUseMockAuth] = useState(false);
-
+  
   const mountedRef = useRef(true);
   const loadingProfileRef = useRef(false);
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    const configured = isSupabaseConfigured();
-    setUseMockAuth(!configured);
-
-    if (!configured) {
-      console.warn('⚠️ Supabase not configured - using mock authentication');
+    if (!isSupabaseConfigured()) {
+      console.warn('⚠️ Supabase not configured. Application requires Supabase credentials (.env) to function securely.');
     }
   }, []);
 
@@ -221,20 +189,6 @@ export function AppProvider({ children }: AppProviderProps) {
     let subscription: any = null;
 
     async function initAuth() {
-      if (useMockAuth) {
-        const storedUser = localStorage.getItem('performtrack_user');
-        const storedWorkspace = localStorage.getItem('performtrack_workspace');
-
-        if (mountedRef.current) {
-          if (storedUser) setUser(JSON.parse(storedUser));
-          if (storedWorkspace) setWorkspace(JSON.parse(storedWorkspace));
-          setIsLoading(false);
-        }
-
-        initializedRef.current = true;
-        return;
-      }
-
       try {
         console.log('[Auth] Starting initialization...');
         safeSetLoading(true);
@@ -272,8 +226,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
     initAuth();
 
-    if (!useMockAuth) {
-      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
         if (!mountedRef.current) return;
 
         console.log('[Auth] State change:', event);
@@ -306,39 +259,14 @@ export function AppProvider({ children }: AppProviderProps) {
           }, 0);
         }
       });
-
       subscription = data.subscription;
-    }
 
     return () => {
       if (subscription) subscription.unsubscribe();
     };
-  }, [useMockAuth]);
+  }, []);
 
   const login = async (email: string, password: string) => {
-    if (useMockAuth) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const userData = MOCK_USERS[email.toLowerCase() as keyof typeof MOCK_USERS];
-
-      if (!userData || userData.password !== password) {
-        throw new Error('Email ou password incorretos');
-      }
-
-      const { password: _, workspaceId, ...userWithoutPassword } = userData;
-      void _;
-      void workspaceId;
-
-      setUser(userWithoutPassword);
-      setWorkspace(MOCK_WORKSPACE);
-
-      localStorage.setItem('performtrack_user', JSON.stringify(userWithoutPassword));
-      localStorage.setItem('performtrack_workspace', JSON.stringify(MOCK_WORKSPACE));
-
-      toast.success(`Bem-vindo, ${userWithoutPassword.name}!`);
-      return;
-    }
-
     try {
       console.log('[Auth] Attempting login with:', email);
 
@@ -362,15 +290,6 @@ export function AppProvider({ children }: AppProviderProps) {
   };
 
   const logout = async () => {
-    if (useMockAuth) {
-      setUser(null);
-      setWorkspace(null);
-      localStorage.removeItem('performtrack_user');
-      localStorage.removeItem('performtrack_workspace');
-      toast.success('Sessão terminada');
-      return;
-    }
-
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
@@ -385,33 +304,6 @@ export function AppProvider({ children }: AppProviderProps) {
   };
 
   const register = async (data: RegisterData) => {
-    if (useMockAuth) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const newUser: User = {
-        id: `${data.role}-${Date.now()}`,
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.email}`,
-      };
-
-      const newWorkspace: Workspace = {
-        id: `workspace-${Date.now()}`,
-        name: data.workspaceName || 'Meu Workspace',
-        type: 'gym',
-      };
-
-      setUser(newUser);
-      setWorkspace(newWorkspace);
-
-      localStorage.setItem('performtrack_user', JSON.stringify(newUser));
-      localStorage.setItem('performtrack_workspace', JSON.stringify(newWorkspace));
-
-      toast.success(`Conta criada com sucesso! Bem-vindo, ${data.name}!`);
-      return;
-    }
-
     try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,

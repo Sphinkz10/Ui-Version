@@ -63,6 +63,8 @@ export function FAB({ onAction }: FABProps) {
 
       {/* Main FAB */}
       <motion.button
+        aria-label={isOpen ? "Fechar menu" : "Abrir menu de ações"}
+        aria-expanded={isOpen}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}

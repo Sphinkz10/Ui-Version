@@ -22,23 +22,27 @@ interface CalendarEvent {
   athleteIds?: string[];
 }
 
-import { Dashboard } from "./components/pages/Dashboard";
-import { Athletes } from "./components/pages/Athletes";
-import { NewAthleteProfile } from "./components/athlete/NewAthleteProfile";
-import { Phase5Summary } from "./components/pages/Phase5Summary";
-import { Lab } from "./components/pages/Lab";
-import { Labs } from "./components/studio/Labs";
-import { ReportBuilderV2 } from "./components/pages/ReportBuilderV2";
-import { DataOS } from "./components/pages/DataOS";
-import { LiveCommand } from "./components/pages/LiveCommand";
-import { Messages } from "./components/pages/Messages";
-import { FormCenter } from "./components/pages/FormCenter";
-import { AutomationPage } from "./components/pages/AutomationPage";
-import { WorkspaceSettings } from "./components/pages/WorkspaceSettings";
-import { FormSubmissionsHistory } from "./components/pages/FormSubmissionsHistory";
-import { CalendarPage } from "./components/pages/CalendarPage";
-import { PrivacyPage } from "./components/pages/PrivacyPage";
-import { TermsPage } from "./components/pages/TermsPage";
+import { lazy, Suspense } from 'react';
+
+// C9 HU-02: Lazy loaded pages to drastically reduce the initial monolithic bundle size
+const Dashboard = lazy(() => import("./components/pages/Dashboard").then(m => ({ default: m.Dashboard })));
+const Athletes = lazy(() => import("./components/pages/Athletes").then(m => ({ default: m.Athletes })));
+const NewAthleteProfile = lazy(() => import("./components/athlete/NewAthleteProfile").then(m => ({ default: m.NewAthleteProfile })));
+const Phase5Summary = lazy(() => import("./components/pages/Phase5Summary").then(m => ({ default: m.Phase5Summary })));
+const Lab = lazy(() => import("./components/pages/Lab").then(m => ({ default: m.Lab })));
+const Labs = lazy(() => import("./components/studio/Labs").then(m => ({ default: m.Labs })));
+const ReportBuilderV2 = lazy(() => import("./components/pages/ReportBuilderV2").then(m => ({ default: m.ReportBuilderV2 })));
+const DataOS = lazy(() => import("./components/pages/DataOS").then(m => ({ default: m.DataOS })));
+const LiveCommand = lazy(() => import("./components/pages/LiveCommand").then(m => ({ default: m.LiveCommand })));
+const Messages = lazy(() => import("./components/pages/Messages").then(m => ({ default: m.Messages })));
+const FormCenter = lazy(() => import("./components/pages/FormCenter").then(m => ({ default: m.FormCenter })));
+const AutomationPage = lazy(() => import("./components/pages/AutomationPage").then(m => ({ default: m.AutomationPage })));
+const WorkspaceSettings = lazy(() => import("./components/pages/WorkspaceSettings").then(m => ({ default: m.WorkspaceSettings })));
+const FormSubmissionsHistory = lazy(() => import("./components/pages/FormSubmissionsHistory").then(m => ({ default: m.FormSubmissionsHistory })));
+const CalendarPage = lazy(() => import("./components/pages/CalendarPage").then(m => ({ default: m.CalendarPage })));
+const PrivacyPage = lazy(() => import("./components/pages/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import("./components/pages/TermsPage").then(m => ({ default: m.TermsPage })));
+import { FeedbackWidget } from "./components/shared/FeedbackWidget";
 import { Header } from "./components/layout/Header";
 import { FAB } from "./components/layout/FAB";
 import { SearchModal } from "./components/modals/SearchModal";
@@ -329,6 +333,10 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+      {/* Skip Navigation Link */}
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-sky-600 focus:rounded-br-xl focus:shadow-md focus:font-semibold">
+        Saltar para o conteúdo principal
+      </a>
       {/* Header */}
       <Header
         onSearchOpen={() => setSearchOpen(true)}
@@ -363,7 +371,9 @@ function AppContent() {
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setCurrentPage(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all text-sm font-medium ${isActive
+                aria-label={item.label}
+                aria-current={isActive ? "page" : undefined}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all text-sm font-medium focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${isActive
                   ? 'bg-gradient-to-r from-sky-500 to-sky-600 text-white shadow-md shadow-sky-500/20'
                   : 'text-slate-700 hover:bg-slate-50'
                   }`}
@@ -453,58 +463,65 @@ function AppContent() {
       </nav>
 
       {/* Main Content with proper spacing for desktop sidebar */}
-      <main className="pb-20 lg:pb-6 lg:ml-64">
-        {currentPage === "home" && (
-          <Dashboard
-            onCreateWorkout={() => setCreateWorkoutOpen(true)}
-            onScheduleSession={() => setScheduleSessionOpen(true)}
-            onStartSession={(sessionId) => {
-              toast.success("Iniciando Live Command...");
-              // Navegar para Live Command
-              setCurrentPage("live-command");
-            }}
-            onViewActiveAthletes={() => setActiveAthletesOpen(true)}
-            onViewTodaySessions={() => setTodaySessionsOpen(true)}
-            onViewAlerts={() => setAlertsOpen(true)}
-            onNavigate={(page) => setCurrentPage(page as Page)}
-          />
-        )}
-        {currentPage === "athletes" && (
-          <Athletes
-            onViewProfile={handleViewAthleteProfile}
-            onSendForm={handleSendFormOpen}
-            onCreateReport={handleCreateReport}
-            onCreateAthlete={() => setCreateAthleteOpen(true)}
-          />
-        )}
-        {currentPage === "athlete-profile" && <NewAthleteProfile athleteId={selectedAthleteId} onBack={() => setCurrentPage("athletes")} />}
-        {currentPage === "calendar" && (
-          <CalendarPage
-            workspaceId={currentWorkspaceId.toString()}
-            onNavigate={(page) => setCurrentPage(page as Page)}
-          />
-        )}
-        {currentPage === "lab" && (
-          <Lab onNavigate={(page) => setCurrentPage(page as Page)} />
-        )}
-        {currentPage === "design-studio" && <Labs />}
-        {currentPage === "report-builder" && <ReportBuilderV2 />}
-        {currentPage === "data-os" && (
-          <DataOS
-            onCreateMetric={() => setCreateMetricOpen(true)}
-            workspaceId={currentWorkspaceId.toString()}
-            workspaceName={currentWorkspace.name}
-          />
-        )}
-        {currentPage === "live-command" && <LiveCommand />}
-        {currentPage === "messages" && <Messages />}
-        {currentPage === "form-center" && <FormCenter />}
-        {currentPage === "form-submissions-history" && <FormSubmissionsHistory onBack={() => setCurrentPage("form-center")} />}
-        {currentPage === "automation-center" && <AutomationPage />}
-        {currentPage === "workspace-settings" && <WorkspaceSettings />}
-        {currentPage === "phase5-summary" && <Phase5Summary />}
-        {currentPage === "privacy" && <PrivacyPage onBack={() => setCurrentPage("home")} />}
-        {currentPage === "terms" && <TermsPage onBack={() => setCurrentPage("home")} />}
+      <main id="main-content" className="pb-20 lg:pb-6 lg:ml-64" tabIndex={-1}>
+        <Suspense fallback={
+          <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4" role="status" aria-live="polite" aria-label="A carregar a aplicação">
+            <div className="w-12 h-12 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin" aria-hidden="true" />
+            <p className="text-slate-500 font-medium">A carregar...</p>
+          </div>
+        }>
+          {currentPage === "home" && (
+            <Dashboard
+              onCreateWorkout={() => setCreateWorkoutOpen(true)}
+              onScheduleSession={() => setScheduleSessionOpen(true)}
+              onStartSession={(sessionId) => {
+                toast.success("Iniciando Live Command...");
+                // Navegar para Live Command
+                setCurrentPage("live-command");
+              }}
+              onViewActiveAthletes={() => setActiveAthletesOpen(true)}
+              onViewTodaySessions={() => setTodaySessionsOpen(true)}
+              onViewAlerts={() => setAlertsOpen(true)}
+              onNavigate={(page) => setCurrentPage(page as Page)}
+            />
+          )}
+          {currentPage === "athletes" && (
+            <Athletes
+              onViewProfile={handleViewAthleteProfile}
+              onSendForm={handleSendFormOpen}
+              onCreateReport={handleCreateReport}
+              onCreateAthlete={() => setCreateAthleteOpen(true)}
+            />
+          )}
+          {currentPage === "athlete-profile" && <NewAthleteProfile athleteId={selectedAthleteId} onBack={() => setCurrentPage("athletes")} />}
+          {currentPage === "calendar" && (
+            <CalendarPage
+              workspaceId={currentWorkspaceId.toString()}
+              onNavigate={(page) => setCurrentPage(page as Page)}
+            />
+          )}
+          {currentPage === "lab" && (
+            <Lab onNavigate={(page) => setCurrentPage(page as Page)} />
+          )}
+          {currentPage === "design-studio" && <Labs />}
+          {currentPage === "report-builder" && <ReportBuilderV2 />}
+          {currentPage === "data-os" && (
+            <DataOS
+              onCreateMetric={() => setCreateMetricOpen(true)}
+              workspaceId={currentWorkspaceId.toString()}
+              workspaceName={currentWorkspace.name}
+            />
+          )}
+          {currentPage === "live-command" && <LiveCommand />}
+          {currentPage === "messages" && <Messages />}
+          {currentPage === "form-center" && <FormCenter />}
+          {currentPage === "form-submissions-history" && <FormSubmissionsHistory onBack={() => setCurrentPage("form-center")} />}
+          {currentPage === "automation-center" && <AutomationPage />}
+          {currentPage === "workspace-settings" && <WorkspaceSettings />}
+          {currentPage === "phase5-summary" && <Phase5Summary />}
+          {currentPage === "privacy" && <PrivacyPage onBack={() => setCurrentPage("home")} />}
+          {currentPage === "terms" && <TermsPage onBack={() => setCurrentPage("home")} />}
+        </Suspense>
       </main>
 
       {/* Bottom Navigation (Mobile) */}
@@ -519,7 +536,9 @@ function AppContent() {
                 key={item.id}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setCurrentPage(item.id)}
-                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl transition-colors ${isActive
+                aria-label={item.label}
+                aria-current={isActive ? "page" : undefined}
+                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${isActive
                   ? 'bg-sky-50 text-sky-600'
                   : 'text-slate-600 active:bg-slate-50'
                   }`}
@@ -551,7 +570,9 @@ function AppContent() {
                 key={item.id}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setCurrentPage(item.id)}
-                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl transition-colors ${isActive
+                aria-label={item.label}
+                aria-current={isActive ? "page" : undefined}
+                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:outline-none ${isActive
                   ? 'bg-sky-50 text-sky-600'
                   : 'text-slate-600 active:bg-slate-50'
                   }`}
@@ -761,6 +782,9 @@ function AppContent() {
         isOpen={alertsOpen}
         onClose={() => setAlertsOpen(false)}
       />
+
+      {/* Global In-App Feedback Widget */}
+      <FeedbackWidget />
 
       {/* Toast Notifications */}
       <Toaster
