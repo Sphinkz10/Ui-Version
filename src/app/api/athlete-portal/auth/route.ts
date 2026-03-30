@@ -32,6 +32,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import jwt from 'jsonwebtoken';
 
 // ============================================================================
 // POST /api/athlete-portal/auth - Authenticate athlete
@@ -115,13 +116,19 @@ export async function POST(request: NextRequest) {
     // ==============================================================
     // For now, we'll just return athlete.id as token
     // In production, you'd use: jwt.sign({ athleteId: athlete.id }, secret)
-    const token = Buffer.from(
-      JSON.stringify({ 
-        athleteId: athlete.id, 
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+
+    const token = jwt.sign(
+      {
+        athleteId: athlete.id,
         workspaceId: athlete.workspace_id,
-        timestamp: Date.now() 
-      })
-    ).toString('base64');
+      },
+      jwtSecret,
+      { expiresIn: '24h' }
+    );
 
     // ==============================================================
     // Return athlete profile
@@ -167,10 +174,18 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7); // Remove 'Bearer '
 
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+
     // Decode token
     let decoded;
     try {
-      decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
+      decoded = jwt.verify(
+        token,
+        jwtSecret
+      ) as jwt.JwtPayload;
     } catch {
       return NextResponse.json(
         { error: 'Invalid token' },

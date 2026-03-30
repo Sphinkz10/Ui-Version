@@ -35,6 +35,37 @@ import crypto from 'crypto';
 // ============================================================================
 export async function POST(request: NextRequest) {
   try {
+    // Basic Authentication Check
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Missing or invalid token' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.substring(7);
+
+    // In a real scenario, you'd verify the token against Supabase or your JWT logic
+    // to ensure the user actually belongs to the workspace they are triggering for.
+    // For this demonstration we use a simple env check or valid token existence.
+    const expectedToken = process.env.INTERNAL_API_KEY;
+
+    // Fail-closed approach: Require the INTERNAL_API_KEY to be configured and matched.
+    if (!expectedToken) {
+      return NextResponse.json(
+        { error: 'Server Misconfiguration - INTERNAL_API_KEY is not set' },
+        { status: 500 }
+      );
+    }
+
+    if (token !== expectedToken) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Invalid API key' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
 
     const { workspaceId, eventType, eventData } = body;

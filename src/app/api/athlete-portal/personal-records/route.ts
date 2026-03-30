@@ -40,6 +40,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import jwt from 'jsonwebtoken';
 
 // Helper to extract athlete from token
 async function getAthleteFromToken(request: NextRequest) {
@@ -52,8 +53,15 @@ async function getAthleteFromToken(request: NextRequest) {
   const token = authHeader.substring(7);
 
   try {
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
-    return decoded.athleteId;
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+    const decoded = jwt.verify(
+      token,
+      jwtSecret
+    ) as jwt.JwtPayload;
+    return { athleteId: decoded.athleteId, workspaceId: decoded.workspaceId };
   } catch {
     return null;
   }
@@ -64,14 +72,15 @@ async function getAthleteFromToken(request: NextRequest) {
 // ============================================================================
 export async function GET(request: NextRequest) {
   try {
-    const athleteId = await getAthleteFromToken(request);
+    const auth = await getAthleteFromToken(request);
 
-    if (!athleteId) {
+    if (!auth || !auth.athleteId) {
       return NextResponse.json(
         { error: 'Unauthorized - Invalid or missing token' },
         { status: 401 }
       );
     }
+    const { athleteId, workspaceId } = auth;
 
     const { searchParams } = new URL(request.url);
     
@@ -81,7 +90,24 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
 
     // ==============================================================
-    // STEP 1: Get personal records
+    // STEP 1: Verify athlete belongs to workspace
+    // ==============================================================
+    const { data: athlete } = await supabase
+      .from('athletes')
+      .select('id')
+      .eq('id', athleteId)
+      .eq('workspace_id', workspaceId) // SEC-002 Ensure workspace isolation
+      .single();
+
+    if (!athlete) {
+      return NextResponse.json(
+        { error: 'Athlete not found or unauthorized' },
+        { status: 404 }
+      );
+    }
+
+    // ==============================================================
+    // STEP 2: Get personal records
     // ==============================================================
     let recordsQuery = supabase
       .from('personal_records')

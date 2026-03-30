@@ -30,6 +30,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import jwt from 'jsonwebtoken';
 
 // Helper to extract athlete from token
 async function getAthleteFromToken(request: NextRequest) {
@@ -42,8 +43,15 @@ async function getAthleteFromToken(request: NextRequest) {
   const token = authHeader.substring(7);
 
   try {
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
-    return decoded.athleteId;
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+    const decoded = jwt.verify(
+      token,
+      jwtSecret
+    ) as jwt.JwtPayload;
+    return { athleteId: decoded.athleteId, workspaceId: decoded.workspaceId };
   } catch {
     return null;
   }
@@ -54,14 +62,15 @@ async function getAthleteFromToken(request: NextRequest) {
 // ============================================================================
 export async function GET(request: NextRequest) {
   try {
-    const athleteId = await getAthleteFromToken(request);
+    const auth = await getAthleteFromToken(request);
 
-    if (!athleteId) {
+    if (!auth || !auth.athleteId) {
       return NextResponse.json(
         { error: 'Unauthorized - Invalid or missing token' },
         { status: 401 }
       );
     }
+    const { athleteId, workspaceId } = auth;
 
     const supabase = await createClient();
 
@@ -81,12 +90,13 @@ export async function GET(request: NextRequest) {
         created_at
       `)
       .eq('id', athleteId)
+      .eq('workspace_id', workspaceId) // SEC-002 explicitly ensure workspace isolation
       .eq('is_active', true)
       .single();
 
     if (athleteError || !athlete) {
       return NextResponse.json(
-        { error: 'Athlete not found' },
+        { error: 'Athlete not found or unauthorized for workspace' },
         { status: 404 }
       );
     }
@@ -262,14 +272,15 @@ export async function GET(request: NextRequest) {
 // ============================================================================
 export async function PUT(request: NextRequest) {
   try {
-    const athleteId = await getAthleteFromToken(request);
+    const auth = await getAthleteFromToken(request);
 
-    if (!athleteId) {
+    if (!auth || !auth.athleteId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
+    const { athleteId, workspaceId } = auth;
 
     const body = await request.json();
     const supabase = await createClient();
@@ -296,6 +307,7 @@ export async function PUT(request: NextRequest) {
       .from('athletes')
       .update(updateData)
       .eq('id', athleteId)
+      .eq('workspace_id', workspaceId) // SEC-002 Ensure workspace isolation
       .select()
       .single();
 

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     // ==================================================
     // 1. SAVE FORM SUBMISSION
     // ==================================================
-    const submissionId = `submission_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const submissionId = `submission_${crypto.randomUUID()}`;
     const submittedAt = new Date().toISOString();
 
     const submission = {

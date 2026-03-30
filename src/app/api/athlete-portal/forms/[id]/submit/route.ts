@@ -26,6 +26,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import jwt from 'jsonwebtoken';
 
 // Helper to extract athlete from token
 async function getAthleteFromToken(request: NextRequest) {
@@ -38,7 +39,14 @@ async function getAthleteFromToken(request: NextRequest) {
   const token = authHeader.substring(7);
 
   try {
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+    const decoded = jwt.verify(
+      token,
+      jwtSecret
+    ) as jwt.JwtPayload;
     return { athleteId: decoded.athleteId, workspaceId: decoded.workspaceId };
   } catch {
     return null;
@@ -83,8 +91,23 @@ export async function POST(
     const supabase = await createClient();
 
     // ==============================================================
-    // STEP 1: Verify form exists and is active
+    // STEP 1: Verify form exists and athlete belongs to workspace
     // ==============================================================
+    // SEC-002 Ensure workspace isolation
+    const { data: athlete } = await supabase
+      .from('athletes')
+      .select('id')
+      .eq('id', athleteId)
+      .eq('workspace_id', workspaceId)
+      .single();
+
+    if (!athlete) {
+      return NextResponse.json(
+        { error: 'Athlete not found or unauthorized' },
+        { status: 404 }
+      );
+    }
+
     const { data: form, error: formError } = await supabase
       .from('forms')
       .select('*')
