@@ -39,6 +39,7 @@ export function FAB({ onAction }: FABProps) {
             {actions.map((action, index) => (
               <motion.button
                 key={action.id}
+                aria-label={action.label}
                 initial={{ opacity: 0, scale: 0, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0, y: 20 }}
