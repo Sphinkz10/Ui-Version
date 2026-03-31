@@ -113,6 +113,7 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
                     {/* Menu Items */}
                     <div className="p-2">
                       <motion.button
+                        aria-label="Configurações da Conta"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
@@ -128,6 +129,7 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
                       </motion.button>
 
                       <motion.button
+                        aria-label="Terminar Sessão"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={handleLogout}
@@ -150,6 +152,7 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
           {/* Workspace Dropdown */}
           <div className="relative">
             <motion.button
+              aria-label="Selecionar Workspace"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setWorkspaceOpen(!workspaceOpen)}
@@ -228,6 +231,7 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
         {/* Search */}
         <div className="flex-1 max-w-md hidden sm:block">
           <button
+            aria-label="Procurar"
             onClick={onSearchOpen}
             className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-500 border border-slate-200 rounded-xl bg-slate-50/50 hover:bg-slate-100/50 transition-all"
           >
@@ -252,6 +256,7 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
           {/* AI Decisions Badge - NEW */}
           {pendingDecisions > 0 && (
             <motion.button
+              aria-label="Decisões AI Pendentes"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onDataOSOpen}

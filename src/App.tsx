@@ -9,9 +9,6 @@ import { logger } from "./lib/logger";
 import { useDecisions } from "./hooks/useDecisions";
 import { generateDemoMessages, isFirstRun } from "./utils/demoData";
 import { AppProvider, useApp } from "./contexts/AppContext";
-import { LoginPage } from "./components/auth/LoginPage";
-import { RegisterPage } from "./components/auth/RegisterPage";
-import { AthleteApp } from "./components/athlete/AthleteApp";
 import { useCreateAthlete } from "./hooks/use-api";
 import { mutate } from "swr";
 
@@ -42,6 +39,9 @@ const FormSubmissionsHistory = lazy(() => import("./components/pages/FormSubmiss
 const CalendarPage = lazy(() => import("./components/pages/CalendarPage").then(m => ({ default: m.CalendarPage })));
 const PrivacyPage = lazy(() => import("./components/pages/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import("./components/pages/TermsPage").then(m => ({ default: m.TermsPage })));
+const LoginPage = lazy(() => import("./components/auth/LoginPage").then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import("./components/auth/RegisterPage").then(m => ({ default: m.RegisterPage })));
+const AthleteApp = lazy(() => import("./components/athlete/AthleteApp").then(m => ({ default: m.AthleteApp })));
 import { FeedbackWidget } from "./components/shared/FeedbackWidget";
 import { Header } from "./components/layout/Header";
 import { FAB } from "./components/layout/FAB";
@@ -817,6 +817,15 @@ export default function App() {
   );
 }
 
+const FallbackLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-slate-50">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin" />
+      <p className="text-slate-500 font-medium animate-pulse">A carregar...</p>
+    </div>
+  </div>
+);
+
 /**
  * Authenticated App Wrapper
  * Handles routing based on authentication state and user role
@@ -830,36 +839,43 @@ function AuthenticatedApp() {
 
   // Show loading state while checking session
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin" />
-          <p className="text-slate-500 font-medium animate-pulse">A carregar...</p>
-        </div>
-      </div>
-    );
+    return <FallbackLoader />;
   }
 
   // Policy pages (accessible before auth)
   if (showPrivacy) {
-    return <PrivacyPage onBack={() => setShowPrivacy(false)} />;
+    return (
+      <Suspense fallback={<FallbackLoader />}>
+        <PrivacyPage onBack={() => setShowPrivacy(false)} />
+      </Suspense>
+    );
   }
   if (showTerms) {
-    return <TermsPage onBack={() => setShowTerms(false)} />;
+    return (
+      <Suspense fallback={<FallbackLoader />}>
+        <TermsPage onBack={() => setShowTerms(false)} />
+      </Suspense>
+    );
   }
 
   // Not authenticated → Show Login or Register
   if (!isAuthenticated) {
     if (showRegister) {
       return (
-        <RegisterPage
-          onLoginClick={() => setShowRegister(false)}
-          onPrivacyClick={() => setShowPrivacy(true)}
-          onTermsClick={() => setShowTerms(true)}
-        />
+        <Suspense fallback={<FallbackLoader />}>
+          <RegisterPage
+            onLoginClick={() => setShowRegister(false)}
+            onPrivacyClick={() => setShowPrivacy(true)}
+            onTermsClick={() => setShowTerms(true)}
+          />
+        </Suspense>
       );
     }
-    return <LoginPage onRegisterClick={() => setShowRegister(true)} />;
+    return (
+      <Suspense fallback={<FallbackLoader />}>
+        <LoginPage onRegisterClick={() => setShowRegister(true)} />
+      </Suspense>
+    );
   }
 
   // Authenticated as Coach → Show full Coach App
@@ -869,9 +885,17 @@ function AuthenticatedApp() {
 
   // Authenticated as Athlete → Show Athlete App
   if (isAthlete) {
-    return <AthleteApp />;
+    return (
+      <Suspense fallback={<FallbackLoader />}>
+        <AthleteApp />
+      </Suspense>
+    );
   }
 
   // Fallback
-  return <LoginPage onRegisterClick={() => setShowRegister(true)} />;
+  return (
+    <Suspense fallback={<FallbackLoader />}>
+      <LoginPage onRegisterClick={() => setShowRegister(true)} />
+    </Suspense>
+  );
 }
