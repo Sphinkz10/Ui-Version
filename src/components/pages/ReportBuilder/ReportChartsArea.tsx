@@ -41,7 +41,7 @@ import {
   PolarRadiusAxis,
   Radar
 } from "recharts";
-import { ChartConfig } from "../ReportBuilderV2";
+import { ChartConfig, MetricData, LineData, BarData, AreaData } from "./types";
 
 export interface ReportChartsAreaProps {
   reportTitle: string;
@@ -81,14 +81,14 @@ export function ReportChartsArea({ reportTitle, generatedCharts, setGeneratedCha
                 { label: "Confiança", value: "87%", color: "sky", icon: CheckCircle },
                 { label: "Alertas", value: "1 atenção", color: "amber", icon: AlertCircle },
                 { label: "Ações", value: "3 sugeridas", color: "violet", icon: Target }
-              ].map(stat => {
+              ].map((stat: { label: string; value: string; color: string; icon: React.ElementType }) => {
                 const Icon = stat.icon;
                 const colorClasses = {
                   emerald: "bg-emerald-100 text-emerald-700",
                   sky: "bg-sky-100 text-sky-700",
                   amber: "bg-amber-100 text-amber-700",
                   violet: "bg-violet-100 text-violet-700"
-                }[stat.color];
+                }[stat.color as "emerald" | "sky" | "amber" | "violet"];
 
                 return (
                   <div key={stat.label} className="text-center p-3 bg-white rounded-xl border border-slate-200">
@@ -321,7 +321,7 @@ export function ReportChartsArea({ reportTitle, generatedCharts, setGeneratedCha
                 { label: "Decisões informadas", value: "5", icon: CheckCircle },
                 { label: "Confiança", value: "87%", icon: Shield },
                 { label: "Insights gerados", value: "8", icon: Sparkles }
-              ].map((metric, index) => {
+              ].map((metric: { label: string; value: string; icon: React.ElementType }, index) => {
                 const Icon = metric.icon;
                 return (
                   <motion.div
@@ -346,8 +346,9 @@ export function ReportChartsArea({ reportTitle, generatedCharts, setGeneratedCha
 
 function ChartRenderer({ config }: { config: ChartConfig }) {
   if (config.type === "metric") {
-    const value = config.data[0]?.value || 92;
-    const target = config.data[0]?.target || 100;
+    const metricData = config.data[0] as MetricData | undefined;
+    const value = metricData?.value || 92;
+    const target = metricData?.target || 100;
     const percentage = Math.round((value / target) * 100);
 
     return (
@@ -419,7 +420,7 @@ function ChartRenderer({ config }: { config: ChartConfig }) {
             activeDot={{ r: 7, strokeWidth: 2 }}
             fill="url(#lineGradient)"
           />
-          {config.data[0]?.target && (
+          {(config.data[0] as LineData)?.target && (
             <Line
               type="monotone"
               dataKey="target"
@@ -454,7 +455,7 @@ function ChartRenderer({ config }: { config: ChartConfig }) {
           <Bar dataKey="força" fill="#0ea5e9" radius={[8, 8, 0, 0]} />
           <Bar dataKey="velocidade" fill="#10b981" radius={[8, 8, 0, 0]} />
           <Bar dataKey="resistência" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
-          {config.data[0]?.potência && (
+          {(config.data[0] as BarData)?.potência && (
             <Bar dataKey="potência" fill="#f59e0b" radius={[8, 8, 0, 0]} />
           )}
         </RechartsBar>
@@ -498,7 +499,7 @@ function ChartRenderer({ config }: { config: ChartConfig }) {
             fill="url(#colorValue)"
             name="Carga Atual"
           />
-          {config.data[0]?.ideal && (
+          {(config.data[0] as AreaData)?.ideal && (
             <Area
               type="monotone"
               dataKey="ideal"
