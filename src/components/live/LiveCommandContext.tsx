@@ -102,7 +102,6 @@ export function LiveCommandProvider({ children }: { children: React.ReactNode })
       if (response.ok) {
         const result = await response.json();
         backendSessionId = result.session.id;
-        console.log('✅ Session created in backend:', backendSessionId);
       } else {
         // Silently fail - log but don't show error to user
         console.warn('⚠️ Backend session creation failed (offline mode)');
@@ -311,13 +310,11 @@ export function LiveCommandProvider({ children }: { children: React.ReactNode })
       }
 
       const result = await response.json();
-      console.log('✅ Session snapshot saved successfully:', result);
-      
+
       // Show success with stats
       toast.success('Sessão concluída e salva!', {
         description: `${setsTotal} sets | ${result.stats.metricUpdatesCreated} métricas | ${result.stats.recordSuggestionsCreated} PRs sugeridos`
       });
-
     } catch (error: any) {
       console.error('❌ CRITICAL: Failed to save session snapshot:', error);
       toast.error('Erro crítico ao salvar sessão', {

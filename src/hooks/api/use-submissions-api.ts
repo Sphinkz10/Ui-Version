@@ -228,9 +228,6 @@ export function useCreateAthlete() {
     try {
       // Debug: Check session
       const { data: { session } } = await supabase.auth.getSession();
-      console.log('[useCreateAthlete] Current Session:', session);
-      console.log('[useCreateAthlete] User ID:', session?.user?.id);
-      console.log('[useCreateAthlete] Role:', session?.user?.role);
 
       if (!session) {
         console.warn('[useCreateAthlete] No active session found! RLS may fail.');
@@ -269,7 +266,6 @@ export function useCreateAthlete() {
       }
 
       return { success: true, athlete: data };
-
     } catch (err: any) {
       console.error('Create athlete error:', err);
       setError(err.message);

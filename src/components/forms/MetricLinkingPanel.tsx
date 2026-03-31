@@ -17,8 +17,8 @@
  *   formId={formId}
  *   fields={formFields}
  *   workspaceId={workspaceId}
- *   onLinkCreated={(link) => console.log('Link created', link)}
- *   onLinkRemoved={(linkId) => console.log('Link removed', linkId)}
+ *   onLinkCreated={(link) => undefined}
+ *   onLinkRemoved={(linkId) => undefined}
  * />
  */
 

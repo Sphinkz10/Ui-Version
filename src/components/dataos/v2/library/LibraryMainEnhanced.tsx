@@ -206,7 +206,6 @@ export function LibraryMainEnhanced({
 
   return (
     <div className="flex h-full flex-col lg:flex-row"> {/* 🎨 Flex col on mobile */}
-      
       {/* 🎨 MOBILE: Filters as Modal Drawer */}
       {isMobile && (
         <ResponsiveModal
@@ -229,7 +228,6 @@ export function LibraryMainEnhanced({
           </div>
         </ResponsiveModal>
       )}
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         
@@ -432,16 +430,13 @@ export function LibraryMainEnhanced({
                   <TemplatesSection
                     onCreateMetric={onCreateMetric}
                     onUseTemplate={(template) => {
-                      console.log('Use template:', template);
                       toast.success(`✨ Usando template: ${template.name}`);
                       onCreateMetric();
                     }}
                     onEditTemplate={(template) => {
-                      console.log('Edit template:', template);
                       toast.info(`✏️ Editar template: ${template.name}`);
                     }}
                     onDeleteTemplate={(template) => {
-                      console.log('Delete template:', template);
                       if (window.confirm(`Eliminar template "${template.name}"?`)) {
                         toast.success('Template eliminado');
                       }
@@ -461,7 +456,6 @@ export function LibraryMainEnhanced({
                       }
                     }}
                     onViewDetails={(pack) => {
-                      console.log('View pack details:', pack);
                       toast.info(`📦 Detalhes: ${pack.packName}`);
                     }}
                   />
@@ -584,7 +578,6 @@ export function LibraryMainEnhanced({
           </div>
         </div>
       </div>
-
       {/* 🎨 DETAILS PANEL - Fullscreen on mobile */}
       <AnimatePresence>
         {detailsPanelOpen && selectedMetric && (
@@ -613,14 +606,12 @@ export function LibraryMainEnhanced({
           />
         )}
       </AnimatePresence>
-
       {/* Packs Library Modal */}
       {packsModalOpen && (
         <PacksLibraryModal
           isOpen={packsModalOpen}
           onClose={() => setPacksModalOpen(false)}
           onActivatePack={(pack) => {
-            console.log('Activate pack:', pack);
             toast.success(`✨ Pack "${pack.name}" ativado!`);
             setPacksModalOpen(false);
             fetchMetrics();

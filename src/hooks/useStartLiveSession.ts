@@ -85,7 +85,6 @@ export function useStartLiveSession(): UseStartLiveSessionReturn {
       }
 
       const data = await response.json();
-      console.log('✅ Live session started from event:', data);
 
       // Transform backend data to LiveCommandContext format
       const liveWorkout: LiveWorkout = {
@@ -142,7 +141,6 @@ export function useStartLiveSession(): UseStartLiveSessionReturn {
 
       setResult(successResult);
       return successResult;
-
     } catch (err: any) {
       const errorMessage = err.message || 'Unknown error occurred';
       console.error('❌ Failed to start live session:', errorMessage);

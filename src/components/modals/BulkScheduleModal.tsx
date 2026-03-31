@@ -52,13 +52,11 @@ export function BulkScheduleModal({
   const handleBulkSchedule = async () => {
     // Gerar eventos baseado no plano
     const events = generateEventsFromPlan();
-    
-    console.log('📅 Creating bulk calendar events:', events);
-    
+
     toast.success(`${events.length} treinos agendados com sucesso!`, {
       description: `Plano "${plan.name}" distribuído no calendário`
     });
-    
+
     onScheduled?.(events);
     onClose();
     resetForm();

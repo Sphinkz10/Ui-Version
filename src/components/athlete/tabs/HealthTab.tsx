@@ -77,8 +77,6 @@ export function HealthTab({ athleteId }: HealthTabProps) {
 
   // ✅ NEW DAY 6: Handle injury delete
   const handleDeleteInjury = async (injuryId: string) => {
-    // TODO: Replace with actual API call
-    console.log('Deleting injury:', injuryId);
     toast.success('🗑️ Lesão eliminada!', {
       description: 'O registo foi removido com sucesso.'
     });
@@ -86,8 +84,6 @@ export function HealthTab({ athleteId }: HealthTabProps) {
 
   // ✅ NEW DAY 6: Handle status update
   const handleUpdateStatus = async (injuryId: string, status: string) => {
-    // TODO: Replace with actual API call
-    console.log('Updating injury status:', injuryId, status);
     toast.success('✅ Estado atualizado!', {
       description: `Lesão marcada como ${status}.`
     });

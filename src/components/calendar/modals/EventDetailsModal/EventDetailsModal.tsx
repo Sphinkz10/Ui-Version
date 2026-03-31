@@ -86,25 +86,22 @@ export function EventDetailsModal({
           athleteIds: editedData.athlete_ids,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to update event');
       }
-      
-      console.log('✅ Event updated successfully:', data.event);
-      
+
       // Invalidate SWR cache
       mutate((key) => typeof key === 'string' && key.startsWith('/api/calendar-events'));
-      
+
       // Back to view mode
       setMode('view');
       setEditedData({});
-      
+
       // Success message
       toast.success(`Evento \"${data.event.title}\" atualizado!`);
-      
     } catch (error) {
       console.error('Error updating event:', error);
       toast.error(error instanceof Error ? error.message : 'Falha ao atualizar evento');
@@ -129,25 +126,22 @@ export function EventDetailsModal({
           athleteIds: editedData.athlete_ids,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to update series');
       }
-      
-      console.log('✅ Series updated successfully:', data);
-      
+
       // Invalidate SWR cache
       mutate((key) => typeof key === 'string' && key.startsWith('/api/calendar-events'));
-      
+
       // Back to view mode
       setMode('view');
       setEditedData({});
-      
+
       // Success message
       toast.success(`Série atualizada! ${data.eventsUpdated} eventos modificados`);
-      
     } catch (error) {
       console.error('Error updating series:', error);
       toast.error(error instanceof Error ? error.message : 'Falha ao atualizar série');
@@ -175,24 +169,21 @@ export function EventDetailsModal({
           method: 'DELETE',
         }
       );
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to delete event');
       }
-      
-      console.log('✅ Event deleted successfully');
-      
+
       // Invalidate SWR cache
       mutate((key) => typeof key === 'string' && key.startsWith('/api/calendar-events'));
-      
+
       // Close modal
       setIsDetailsModalOpen(false);
-      
+
       // Success message
       toast.success(permanent ? 'Evento deletado permanentemente' : 'Evento cancelado');
-      
     } catch (error) {
       console.error('Error deleting event:', error);
       toast.error(error instanceof Error ? error.message : 'Falha ao eliminar evento');
@@ -210,25 +201,22 @@ export function EventDetailsModal({
           method: 'DELETE',
         }
       );
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to delete series');
       }
-      
-      console.log('✅ Series deleted successfully');
-      
+
       // Invalidate SWR cache
       mutate((key) => typeof key === 'string' && key.startsWith('/api/calendar-events'));
-      
+
       // Close modal
       setIsDetailsModalOpen(false);
       setMode('view');
-      
+
       // Success message
       toast.success(`Série eliminada! ${data.eventsDeleted} eventos removidos`);
-      
     } catch (error) {
       console.error('Error deleting series:', error);
       toast.error(error instanceof Error ? error.message : 'Falha ao eliminar série');

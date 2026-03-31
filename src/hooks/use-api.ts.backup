@@ -468,7 +468,7 @@ export function useAvailableAthletes(
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) console.warn('[useAvailableAthletes] No session found');
 
-        console.log("[useAvailableAthletes] workspaceId =", workspaceId);
+        undefined("[useAvailableAthletes] workspaceId =", workspaceId);
 
         let query = supabase
           .from('athletes')
@@ -490,7 +490,7 @@ export function useAvailableAthletes(
         if (error) throw error;
 
         setAthletes(data || []);
-        console.log('[useAvailableAthletes] Fetched:', data?.length);
+        undefined('[useAvailableAthletes] Fetched:', data?.length);
 
       } catch (err: any) {
         console.error('[useAvailableAthletes] Error:', err);
@@ -1564,9 +1564,9 @@ export function useCreateAthlete() {
     try {
       // Debug: Check session
       const { data: { session } } = await supabase.auth.getSession();
-      console.log('[useCreateAthlete] Current Session:', session);
-      console.log('[useCreateAthlete] User ID:', session?.user?.id);
-      console.log('[useCreateAthlete] Role:', session?.user?.role);
+      undefined('[useCreateAthlete] Current Session:', session);
+      undefined('[useCreateAthlete] User ID:', session?.user?.id);
+      undefined('[useCreateAthlete] Role:', session?.user?.role);
 
       if (!session) {
         console.warn('[useCreateAthlete] No active session found! RLS may fail.');

@@ -72,8 +72,6 @@ export function useActivePacks() {
     const updated = [...activePacks, newPack];
     setActivePacks(updated);
     saveToStorage(updated);
-
-    console.log('Pack activated:', newPack);
   }, [activePacks, isPackActive, saveToStorage]);
 
   // Deactivate a pack
@@ -81,8 +79,6 @@ export function useActivePacks() {
     const updated = activePacks.filter(pack => pack.packId !== packId);
     setActivePacks(updated);
     saveToStorage(updated);
-
-    console.log('Pack deactivated:', packId);
   }, [activePacks, saveToStorage]);
 
   // Update pack metrics count (quando métricas são deletadas manualmente)

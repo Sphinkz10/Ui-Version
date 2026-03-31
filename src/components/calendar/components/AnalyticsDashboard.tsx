@@ -117,10 +117,7 @@ export function AnalyticsDashboard({ events, dateRange, athletes = [] }: Analyti
   const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#64748b'];
   
   // Export to PDF (mock)
-  const handleExportPDF = () => {
-    console.log('Export to PDF...');
-    // Would implement PDF export here
-  };
+  const handleExportPDF = () => {};
   
   return (
     <div className="space-y-6">

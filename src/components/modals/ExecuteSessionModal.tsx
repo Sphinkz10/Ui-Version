@@ -173,7 +173,7 @@ export function ExecuteSessionModal({ isOpen, onClose, sessionData, mode = "temp
   const [isResting, setIsResting] = useState(false);
   const [restTimeLeft, setRestTimeLeft] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  
+
   const [logs, setLogs] = useState<ExerciseLog[]>([]);
   const [sessionStartTime] = useState(new Date());
   const [sessionElapsed, setSessionElapsed] = useState(0);
@@ -290,8 +290,6 @@ export function ExecuteSessionModal({ isOpen, onClose, sessionData, mode = "temp
   const progress = (getCompletedSets() / getTotalSets()) * 100;
 
   if (!isOpen || !currentExercise) return null;
-
-  console.log('🎯 ExecuteSessionModal rendering:', { isOpen, currentExercise: currentExercise?.name, showAddExercise });
 
   return (
     <AnimatePresence>
@@ -428,7 +426,7 @@ export function ExecuteSessionModal({ isOpen, onClose, sessionData, mode = "temp
                 </motion.div>
               ) : (
                 /* EXERCISE SCREEN */
-                <motion.div
+                (<motion.div
                   key="exercise"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -449,7 +447,6 @@ export function ExecuteSessionModal({ isOpen, onClose, sessionData, mode = "temp
                       Série {currentSet} de {currentExercise.sets}
                     </p>
                   </div>
-
                   {/* Input Values */}
                   <div className="space-y-4">
                     {/* Reps */}
@@ -502,7 +499,6 @@ export function ExecuteSessionModal({ isOpen, onClose, sessionData, mode = "temp
                       </div>
                     )}
                   </div>
-
                   {/* Previous Sets (if any) */}
                   {currentSet > 1 && (
                     <div className="rounded-xl bg-slate-50 border border-slate-200 p-4">
@@ -523,7 +519,6 @@ export function ExecuteSessionModal({ isOpen, onClose, sessionData, mode = "temp
                       </div>
                     </div>
                   )}
-
                   {/* Mode Info */}
                   {mode === "template" && (
                     <div className="rounded-xl bg-sky-50 border border-sky-200 p-3">
@@ -532,7 +527,6 @@ export function ExecuteSessionModal({ isOpen, onClose, sessionData, mode = "temp
                       </p>
                     </div>
                   )}
-
                   {mode === "coach" && (
                     <div className="rounded-xl bg-violet-50 border border-violet-200 p-3">
                       <p className="text-xs text-violet-900">
@@ -540,7 +534,7 @@ export function ExecuteSessionModal({ isOpen, onClose, sessionData, mode = "temp
                       </p>
                     </div>
                   )}
-                </motion.div>
+                </motion.div>)
               )}
             </AnimatePresence>
           </div>

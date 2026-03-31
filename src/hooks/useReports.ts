@@ -51,7 +51,7 @@ interface UseReportsReturn {
   loading: boolean;
   generating: boolean;
   error: string | null;
-  fetchReports: () => Promise<void>;
+  fetchReports: (signal?: AbortSignal) => Promise<void>;
   createReport: (data: Partial<Report>) => Promise<Report | null>;
   updateReport: (id: string, data: Partial<Report>) => Promise<boolean>;
   deleteReport: (id: string) => Promise<boolean>;
@@ -75,16 +75,16 @@ export function useReports({
   // ============================================================================
   // FETCH REPORTS
   // ============================================================================
-  const fetchReports = useCallback(async () => {
+  const fetchReports = useCallback(async (signal?: AbortSignal) => {
     try {
       const isInitialLoad = reports.length === 0;
-      
+
       if (isInitialLoad) {
         setLoading(true);
       } else {
         setRefreshing(true);
       }
-      
+
       setError(null);
 
       const params = new URLSearchParams({
@@ -93,18 +93,18 @@ export function useReports({
         ...(isTemplate !== undefined && { isTemplate: String(isTemplate) })
       });
 
-      const response = await fetch(`/app/api/reports?${params}`);
-      
+      const response = await fetch(`/app/api/reports?${params}`, { signal });
+
       if (!response.ok) {
         throw new Error('Failed to fetch reports');
       }
 
       const data = await response.json();
       setReports(data.reports || []);
-      
-      console.log(`✅ [useReports] Loaded ${data.reports?.length || 0} reports`);
-
     } catch (err: any) {
+      if (err.name === 'AbortError') {
+        return; // Ignora o erro se o request foi abortado
+      }
       console.error('❌ [useReports] Error:', err);
       setError(err.message);
       toast.error('Erro ao carregar reports');
@@ -115,10 +115,16 @@ export function useReports({
   }, [workspaceId, category, isTemplate, reports.length]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     if (autoFetch) {
-      fetchReports();
+      fetchReports(controller.signal);
     }
-  }, [autoFetch, category, isTemplate]);
+
+    return () => {
+      controller.abort();
+    };
+  }, [autoFetch, category, isTemplate, fetchReports]);
 
   // ============================================================================
   // CREATE REPORT

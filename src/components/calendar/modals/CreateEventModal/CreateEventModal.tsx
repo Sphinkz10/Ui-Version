@@ -212,8 +212,6 @@ export function CreateEventModal({
         throw new Error(error.message || 'Falha ao criar evento');
       }
 
-      console.log('✅ Event created successfully:', createdEvent);
-
       // Invalidate SWR cache to refresh events
       mutate((key) => typeof key === 'string' && key.startsWith('/api/calendar-events'));
 
@@ -234,7 +232,6 @@ export function CreateEventModal({
       toast.success(`Evento "${data.event.title}" criado com sucesso!`, {
         duration: 4000,
       });
-
     } catch (error) {
       console.error('Error creating event:', error);
       toast.error(error instanceof Error ? error.message : 'Falha ao criar evento');
@@ -288,8 +285,6 @@ export function CreateEventModal({
   };
 
   const handleSaveTemplate = (template: Partial<EventTemplate>) => {
-    // TODO: Save template to API
-    console.log('Saving template:', template);
     toast.success('Template guardado! (Mock - API em desenvolvimento)');
     setShowCreateTemplateModal(false);
   };

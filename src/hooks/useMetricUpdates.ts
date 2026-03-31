@@ -83,13 +83,13 @@ export function useMetricUpdates({
 
     try {
       const isInitialLoad = updates.length === 0;
-      
+
       if (isInitialLoad) {
         setLoading(true);
       } else {
         setRefreshing(true);
       }
-      
+
       setError(null);
 
       const params = new URLSearchParams({
@@ -99,16 +99,13 @@ export function useMetricUpdates({
       });
 
       const response = await fetch(`/app/api/metric-updates?${params}`);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch updates: ${response.statusText}`);
       }
 
       const data = await response.json();
       setUpdates(data.updates || []);
-      
-      console.log(`✅ [useMetricUpdates] Loaded ${data.updates?.length || 0} updates`);
-
     } catch (err: any) {
       console.error('❌ [useMetricUpdates] Error:', err);
       setError(err.message);

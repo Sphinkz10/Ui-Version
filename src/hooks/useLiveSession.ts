@@ -15,7 +15,7 @@
  * const { session, participants, progress, refresh } = useLiveSession({
  *   sessionId: 'session-123',
  *   autoRefresh: true,
- *   onUpdate: (session) => console.log('Session updated!'),
+ *   onUpdate: (session) => undefined,
  * });
  * 
  * @author PerformTrack Team

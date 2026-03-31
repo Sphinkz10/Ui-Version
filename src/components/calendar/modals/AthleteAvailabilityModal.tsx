@@ -111,8 +111,6 @@ export function AthleteAvailabilityModal({
   };
   
   const handleSave = async () => {
-    // TODO: API call to save availability
-    console.log('Saving availability blocks:', availabilityBlocks);
     toast.success('Disponibilidade guardada com sucesso!');
     onClose();
   };

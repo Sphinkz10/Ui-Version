@@ -125,7 +125,7 @@ export function LibraryMain({
 
       // ✅ FIX: Correct API path (remove /app prefix)
       const response = await fetch(`/api/metrics?${params}`);
-      
+
       if (!response.ok) {
         // If API fails, fallback to mock data
         console.warn(`⚠️ [Library] API failed (${response.status}), using mock data`);
@@ -136,9 +136,6 @@ export function LibraryMain({
 
       const data = await response.json();
       setMetrics(data.metrics || []);
-      
-      console.log(`✅ [Library] Loaded ${data.metrics?.length || 0} metrics`);
-
     } catch (err: any) {
       console.warn('⚠️ [Library] Error fetching metrics, using mock data:', err.message);
       // Fallback to mock data instead of showing error
@@ -205,7 +202,6 @@ export function LibraryMain({
   };
 
   const handleDuplicate = (metric: Metric) => {
-    console.log('Duplicate metric:', metric);
     alert(`🔄 Duplicando métrica: ${metric.name}\n\nEsta funcionalidade criará uma cópia da métrica com o prefixo "Cópia de..."`);
   };
 
@@ -467,26 +463,21 @@ export function LibraryMain({
                   <TemplatesSection
                     onCreateMetric={onCreateMetric}
                     onUseTemplate={(template) => {
-                      console.log('Use template:', template);
                       alert(`✨ Abrindo wizard com template: ${template.name}`);
                       onCreateMetric();
                     }}
                     onEditTemplate={(template) => {
-                      console.log('Edit template:', template);
                       alert(`✏️ Editar template: ${template.name}`);
                     }}
                     onDeleteTemplate={(template) => {
-                      console.log('Delete template:', template);
                       if (confirm(`❌ Deletar template "${template.name}"?\n\nIsto não afeta métricas já criadas.`)) {
                         alert('Template deletado!');
                       }
                     }}
                     onDuplicateTemplate={(template) => {
-                      console.log('Duplicate template:', template);
                       alert(`📋 Template duplicado: Cópia de ${template.name}`);
                     }}
                     onShareTemplate={(template) => {
-                      console.log('Share template:', template);
                       alert(`🔗 Partilhar template: ${template.name}\n\nGerar link público ou partilhar dentro do workspace?`);
                     }}
                   />
@@ -499,12 +490,8 @@ export function LibraryMain({
                   <ActivePacksSection
                     packs={mockActivePacks}
                     isLoading={false}
-                    onViewPackMetrics={(packId, metricIds) => {
-                      console.log('View pack metrics:', packId, metricIds);
-                    }}
-                    onDeactivatePack={(pack) => {
-                      console.log('Deactivate pack:', pack);
-                    }}
+                    onViewPackMetrics={(packId, metricIds) => {}}
+                    onDeactivatePack={(pack) => {}}
                   />
 
                   {/* Browse More */}
@@ -678,7 +665,6 @@ export function LibraryMain({
           </div>
         </div>
       </div>
-
       {/* Details Panel (slides from right) */}
       <DetailsPanel
         metric={selectedMetric}
@@ -698,13 +684,11 @@ export function LibraryMain({
           onViewHistory?.(metric);
         }}
       />
-
       {/* Packs Modal (REUSED) */}
       <PacksLibraryModal
         open={packsModalOpen}
         onClose={() => setPacksModalOpen(false)}
         onActivatePack={(packId) => {
-          console.log('Activate pack:', packId);
           setPacksModalOpen(false);
         }}
       />

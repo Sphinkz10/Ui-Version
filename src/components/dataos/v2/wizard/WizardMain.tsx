@@ -64,9 +64,6 @@ export function WizardMain({ isOpen, onClose, onComplete, workspaceId }: WizardM
 
   const handleFinish = useCallback(async () => {
     try {
-      // TODO: Replace with real API call
-      console.log('Creating metric with config:', wizardState);
-      
       toast.success('Métrica criada com sucesso!', {
         description: `"${wizardState.metricName}" foi ${wizardState.deployment.target === 'test-only' ? 'guardada em modo teste' : 'aplicada aos atletas'}`,
       });

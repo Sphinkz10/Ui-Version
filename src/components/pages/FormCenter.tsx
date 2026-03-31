@@ -1234,7 +1234,6 @@ function FormBuilder({ onClose }: { onClose: () => void }) {
           </div>
         )}
       </div>
-
       {/* Quick Config Modal */}
       {showQuickConfig && fieldBeingConfigured && (
         <FieldQuickConfigModal
@@ -1247,20 +1246,17 @@ function FormBuilder({ onClose }: { onClose: () => void }) {
           }}
         />
       )}
-
       {/* Conditional Logic Modal */}
       {showConditionalLogic && (
         <ConditionalLogicModal
           formFields={formFields}
           rules={[]}
           onSave={(rules) => {
-            console.log("Regras salvas:", rules);
             setShowConditionalLogic(false);
           }}
           onClose={() => setShowConditionalLogic(false)}
         />
       )}
-
       {/* Form Analytics Modal */}
       {showFormAnalytics && (
         <FormAnalyticsModal
@@ -1275,7 +1271,6 @@ function FormBuilder({ onClose }: { onClose: () => void }) {
           onClose={() => setShowFormAnalytics(false)}
         />
       )}
-
       {/* Email Template Modal */}
       {showEmailTemplate && (
         <EmailTemplateModal
@@ -1286,7 +1281,6 @@ function FormBuilder({ onClose }: { onClose: () => void }) {
           }}
           onClose={() => setShowEmailTemplate(false)}
           onSend={(config) => {
-            console.log("Email config:", config);
             setShowEmailTemplate(false);
           }}
         />

@@ -84,13 +84,13 @@ export function useAutomation({
   const fetchRules = useCallback(async () => {
     try {
       const isInitialLoad = rules.length === 0;
-      
+
       if (isInitialLoad) {
         setLoading(true);
       } else {
         setRefreshing(true);
       }
-      
+
       setError(null);
 
       const params = new URLSearchParams({
@@ -100,16 +100,13 @@ export function useAutomation({
       });
 
       const response = await fetch(`/app/api/automation/rules?${params}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch rules');
       }
 
       const data = await response.json();
       setRules(data.rules || []);
-      
-      console.log(`✅ [useAutomation] Loaded ${data.rules?.length || 0} rules`);
-
     } catch (err: any) {
       console.error('❌ [useAutomation] Error:', err);
       setError(err.message);
