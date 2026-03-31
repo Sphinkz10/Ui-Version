@@ -186,7 +186,7 @@ export function useMessages() {
    */
   const sendMessage = useCallback((conversationId: string, text: string) => {
     const newMessage: Message = {
-      id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `msg-${Date.now()}-${crypto.randomUUID()}`,
       conversationId,
       senderId: 'me',
       text,
@@ -224,7 +224,7 @@ export function useMessages() {
    */
   const receiveMessage = useCallback((conversationId: string, senderId: string, text: string) => {
     const newMessage: Message = {
-      id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `msg-${Date.now()}-${crypto.randomUUID()}`,
       conversationId,
       senderId,
       text,

@@ -225,7 +225,7 @@ export function LiveCommandProvider({ children }: { children: React.ReactNode })
 
     // Criar snapshot
     const snapshot: SessionSnapshot = {
-      id: `snapshot_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `snapshot_${Date.now()}_${crypto.randomUUID()}`,
       version: '1.0',
       immutable: true,
       sessionId: session.config.sessionId,
@@ -609,5 +609,5 @@ export function useLiveCommand() {
 }
 
 function generateSnapshotHash(): string {
-  return `hash_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `hash_${Date.now()}_${crypto.randomUUID()}`;
 }
