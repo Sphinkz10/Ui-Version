@@ -51,7 +51,7 @@ interface UseFormSubmissionsReturn {
   submitting: boolean;
   error: string | null;
   submitForm: (options: SubmitFormOptions) => Promise<SubmitResult>;
-  fetchSubmissions: (formId?: string, athleteId?: string) => Promise<void>;
+  fetchSubmissions: (formId?: string, athleteId?: string, signal?: AbortSignal) => Promise<void>;
   retrySubmission: (submissionId: string) => Promise<boolean>;
 }
 
@@ -81,8 +81,6 @@ export function useFormSubmissions(
         workspace_id: workspaceId
       };
 
-      console.log(`📋 [Submit] Form ${options.form_id}, Athlete ${options.athlete_id}`);
-
       const response = await fetch('/app/api/forms/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,21 +107,18 @@ export function useFormSubmissions(
 
       // Success
       const metricsCreated = data.metricsCreated || 0;
-      
+
       toast.success('Formulário submetido!', {
         description: metricsCreated > 0 
           ? `${metricsCreated} métricas criadas automaticamente`
           : 'Respostas guardadas com sucesso'
       });
 
-      console.log(`✅ [Submit] Success! Metrics created: ${metricsCreated}`);
-
       return {
         success: true,
         submission: data.submission,
         metricsCreated
       };
-
     } catch (err: any) {
       console.error('❌ [Submit] Error:', err);
       setError(err.message);
@@ -146,7 +141,8 @@ export function useFormSubmissions(
   // ============================================================================
   const fetchSubmissions = useCallback(async (
     formId?: string,
-    athleteId?: string
+    athleteId?: string,
+    signal?: AbortSignal
   ) => {
     try {
       setLoading(true);
@@ -158,18 +154,18 @@ export function useFormSubmissions(
         ...(athleteId && { athleteId })
       });
 
-      const response = await fetch(`/app/api/forms/submissions?${params}`);
-      
+      const response = await fetch(`/app/api/forms/submissions?${params}`, { signal });
+
       if (!response.ok) {
         throw new Error('Failed to fetch submissions');
       }
 
       const data = await response.json();
       setSubmissions(data.submissions || []);
-
-      console.log(`✅ [Fetch] Loaded ${data.submissions?.length || 0} submissions`);
-
     } catch (err: any) {
+      if (err.name === 'AbortError') {
+        return; // Ignora o erro se o request foi abortado
+      }
       console.error('❌ [Fetch] Error:', err);
       setError(err.message);
       toast.error('Erro ao carregar submissions');

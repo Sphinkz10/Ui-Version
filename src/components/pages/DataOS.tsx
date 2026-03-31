@@ -107,8 +107,6 @@ export function DataOS({ onCreateMetric, workspaceId = 'workspace-1', workspaceN
   // FASE 3: Quick Entry handler
   const handleQuickEntrySave = async (entry: any) => {
     try {
-      console.log('Quick Entry saving:', entry);
-
       // Call API
       const response = await fetch('/api/metric-updates', {
         method: 'POST',
@@ -129,7 +127,6 @@ export function DataOS({ onCreateMetric, workspaceId = 'workspace-1', workspaceN
       }
 
       const result = await response.json();
-      console.log('Quick Entry saved:', result);
 
       // Show success with analysis
       const { update, analysis } = result;
@@ -155,8 +152,6 @@ export function DataOS({ onCreateMetric, workspaceId = 'workspace-1', workspaceN
   // FASE 3: Bulk Entry handler
   const handleBulkEntrySave = async (entries: any[]) => {
     try {
-      console.log('Bulk Entry saving:', entries);
-
       // Call BULK API
       const response = await fetch('/api/metric-updates/bulk', {
         method: 'POST',
@@ -179,7 +174,6 @@ export function DataOS({ onCreateMetric, workspaceId = 'workspace-1', workspaceN
       }
 
       const result = await response.json();
-      console.log('Bulk Entry saved:', result);
 
       // Show success with summary
       const { results, summary } = result;
@@ -266,9 +260,7 @@ export function DataOS({ onCreateMetric, workspaceId = 'workspace-1', workspaceN
                   const metric = metrics.find(m => m.id === metricId);
                   if (metric) handleViewHistory(metric);
                 }}
-                onRefresh={() => {
-                  console.log('🔄 Refreshing Live Board data...');
-                }}
+                onRefresh={() => {}}
                 workspaceId={workspaceId}
                 workspaceName={workspaceName}
               />
@@ -278,9 +270,7 @@ export function DataOS({ onCreateMetric, workspaceId = 'workspace-1', workspaceN
           {activeTab === 'automation' && (
             <div className="h-full overflow-y-auto pb-20 lg:pb-6">
               <AutomationMain
-                onCreateRule={() => {
-                  console.log('🎯 Creating new automation rule...');
-                }}
+                onCreateRule={() => {}}
                 workspaceId={workspaceId}
                 workspaceName={workspaceName}
               />
@@ -437,10 +427,8 @@ export function DataOS({ onCreateMetric, workspaceId = 'workspace-1', workspaceN
           )}
         </div>
       </div>
-
       {/* FASE 2: Modals */}
       {/* CreateMetricModal removed - using WizardMain in App.tsx now */}
-
       <MetricHistoryDrawer
         metric={selectedMetric}
         athleteId={historyAthleteId}
@@ -448,7 +436,6 @@ export function DataOS({ onCreateMetric, workspaceId = 'workspace-1', workspaceN
         isOpen={isHistoryDrawerOpen}
         onClose={() => setIsHistoryDrawerOpen(false)}
       />
-
       {/* FASE 3: Quick Entry Modal */}
       <QuickEntryModal
         isOpen={isQuickEntryOpen}
@@ -458,7 +445,6 @@ export function DataOS({ onCreateMetric, workspaceId = 'workspace-1', workspaceN
         athletes={athletes}
         metrics={metrics}
       />
-
       {/* FASE 3: Bulk Entry Modal */}
       <BulkEntryModal
         isOpen={isBulkEntryOpen}

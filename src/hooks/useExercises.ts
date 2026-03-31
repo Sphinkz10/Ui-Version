@@ -92,13 +92,13 @@ export function useExercises({
   const fetchExercises = useCallback(async () => {
     try {
       const isInitialLoad = exercises.length === 0;
-      
+
       if (isInitialLoad) {
         setLoading(true);
       } else {
         setRefreshing(true);
       }
-      
+
       setError(null);
 
       const params = new URLSearchParams({
@@ -110,16 +110,13 @@ export function useExercises({
       });
 
       const response = await fetch(`/app/api/exercises?${params}`);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch exercises: ${response.statusText}`);
       }
 
       const data = await response.json();
       setExercises(data.exercises || []);
-      
-      console.log(`✅ [useExercises] Loaded ${data.exercises?.length || 0} exercises`);
-
     } catch (err: any) {
       console.error('❌ [useExercises] Error:', err);
       setError(err.message);

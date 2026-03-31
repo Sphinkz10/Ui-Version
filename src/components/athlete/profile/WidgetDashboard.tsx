@@ -106,7 +106,6 @@ export function WidgetDashboard({ athleteId }: WidgetDashboardProps) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              console.log('Settings clicked!');
               toast.info('⚙️ Configurar Widgets', {
                 description: 'Personaliza os teus widgets de dashboard'
               });
@@ -119,7 +118,6 @@ export function WidgetDashboard({ athleteId }: WidgetDashboardProps) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              console.log('Add widget clicked!');
               toast.success('🎨 Widget Builder em breve!', {
                 description: 'Cria widgets personalizados com métricas custom'
               });
@@ -130,7 +128,6 @@ export function WidgetDashboard({ athleteId }: WidgetDashboardProps) {
           </motion.button>
         </div>
       </div>
-
       {/* Widget: Carga Semanal */}
       {loadData.length > 0 && (
         <motion.div
@@ -184,7 +181,6 @@ export function WidgetDashboard({ athleteId }: WidgetDashboardProps) {
           </ResponsiveContainer>
         </motion.div>
       )}
-
       {/* Widget: RPE Médio */}
       {rpeData.length > 0 && (
         <motion.div
@@ -231,7 +227,6 @@ export function WidgetDashboard({ athleteId }: WidgetDashboardProps) {
           </ResponsiveContainer>
         </motion.div>
       )}
-
       {/* Widget: Prontidão */}
       {readinessData.length > 0 && (
         <motion.div
@@ -280,7 +275,6 @@ export function WidgetDashboard({ athleteId }: WidgetDashboardProps) {
           </ResponsiveContainer>
         </motion.div>
       )}
-
       {/* Widget: Métricas Rápidas */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -318,13 +312,11 @@ export function WidgetDashboard({ athleteId }: WidgetDashboardProps) {
           )}
         </div>
       </motion.div>
-
       {/* Add Widget Button */}
       <motion.button
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         onClick={() => {
-          console.log('Add Widget button clicked!');
           toast.success('🎨 Widget Builder', {
             description: 'Seleciona o tipo de widget que queres adicionar',
             duration: 4000

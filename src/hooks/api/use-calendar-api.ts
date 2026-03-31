@@ -118,8 +118,6 @@ export function useAvailableAthletes(
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) console.warn('[useAvailableAthletes] No session found');
 
-        console.log("[useAvailableAthletes] workspaceId =", workspaceId);
-
         let query = supabase
           .from('athletes')
           .select('*')
@@ -140,8 +138,6 @@ export function useAvailableAthletes(
         if (error) throw error;
 
         setAthletes(data || []);
-        console.log('[useAvailableAthletes] Fetched:', data?.length);
-
       } catch (err: any) {
         console.error('[useAvailableAthletes] Error:', err);
         setError(err);

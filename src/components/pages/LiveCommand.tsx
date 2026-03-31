@@ -134,7 +134,6 @@ export function LiveCommand() {
           workout={selectedWorkout}
           onExit={() => setActiveLive(false)}
           onComplete={(snapshot) => {
-            console.log('Session completed:', snapshot);
             setActiveLive(false);
           }}
         />

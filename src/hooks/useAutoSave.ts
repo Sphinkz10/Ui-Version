@@ -28,7 +28,6 @@ export function useAutoSave<T>({ data, key, delay = 2000, onSave }: UseAutoSaveO
       try {
         sessionStorage.setItem(key, JSON.stringify(data));
         onSave?.(data);
-        console.log(`Auto-saved: ${key}`);
       } catch (error) {
         console.error("Auto-save failed:", error);
       }
@@ -59,7 +58,6 @@ export function useLoadSavedData<T>(key: string, defaultValue: T): T {
 export function clearSavedData(key: string) {
   try {
     sessionStorage.removeItem(key);
-    console.log(`Cleared saved data: ${key}`);
   } catch (error) {
     console.error("Failed to clear saved data:", error);
   }

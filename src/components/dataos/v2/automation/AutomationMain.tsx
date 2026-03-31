@@ -474,7 +474,6 @@ export function AutomationMain({ onCreateRule, workspaceId, workspaceName }: Aut
           })}
         </div>
       </div>
-
       {/* Content */}
       <div className="flex-1 overflow-hidden bg-slate-50">
         {isCreating || editingRule ? (
@@ -494,14 +493,12 @@ export function AutomationMain({ onCreateRule, workspaceId, workspaceName }: Aut
             onEdit={(rule) => setEditingRule(rule)}
             onDelete={handleDeleteRule}
             onTest={(rule) => {
-              console.log('Test rule:', rule);
               setViewMode('testing');
             }}
           />
         ) : viewMode === 'templates' ? (
           <RuleTemplatesLibrary
             onUseTemplate={(template) => {
-              console.log('Use template:', template);
               setEditingRule(template);
               setIsCreating(true);
             }}

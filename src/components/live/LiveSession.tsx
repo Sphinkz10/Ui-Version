@@ -212,7 +212,6 @@ export function LiveSession({ calendarEventId, workout, onExit, onComplete }: Li
           </div>
         </div>
       </header>
-
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar - Exercise List */}
@@ -304,7 +303,6 @@ export function LiveSession({ calendarEventId, workout, onExit, onComplete }: Li
           </div>
         </main>
       </div>
-
       {/* Footer Controls */}
       <footer className="bg-slate-800/90 backdrop-blur-sm border-t border-slate-700 px-4 sm:px-6 py-4">
         <div className="max-w-6xl mx-auto">
@@ -366,7 +364,6 @@ export function LiveSession({ calendarEventId, workout, onExit, onComplete }: Li
           </div>
         </div>
       </footer>
-
       {/* Completion Modal */}
       <AnimatePresence>
         {showCompletionModal && snapshot && (
@@ -380,7 +377,6 @@ export function LiveSession({ calendarEventId, workout, onExit, onComplete }: Li
           />
         )}
       </AnimatePresence>
-
       {/* EXERCISE LIST MODAL - with Drag & Drop */}
       <AnimatePresence>
         {showExerciseList && (
@@ -424,10 +420,7 @@ export function LiveSession({ calendarEventId, workout, onExit, onComplete }: Li
                       onDragStart={() => setDraggedIndex(index)}
                       onDragOver={(e) => {
                         e.preventDefault();
-                        if (draggedIndex !== null && draggedIndex !== index) {
-                          // TODO: Swap exercises in workout
-                          console.log(`Move exercise from ${draggedIndex} to ${index}`);
-                        }
+                        if (draggedIndex !== null && draggedIndex !== index) {}
                       }}
                       onDragEnd={() => setDraggedIndex(null)}
                       className={`p-4 rounded-xl border-2 transition-all cursor-move ${
@@ -484,7 +477,6 @@ export function LiveSession({ calendarEventId, workout, onExit, onComplete }: Li
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* ADD EXERCISE MODAL */}
       <AnimatePresence>
         {showAddExercise && (
@@ -547,8 +539,6 @@ export function LiveSession({ calendarEventId, workout, onExit, onComplete }: Li
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
-                          // TODO: Add exercise to workout
-                          console.log('Adding exercise:', exercise.name);
                           setShowAddExercise(false);
                           setSearchQuery(''); // Reset search
                         }}

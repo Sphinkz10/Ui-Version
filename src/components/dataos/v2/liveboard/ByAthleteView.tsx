@@ -213,9 +213,6 @@ export function ByAthleteView({ athletes, metrics, values: propValues, onUpdateV
 
     onUpdateValue?.(editingCell.athleteId, editingCell.metricId, value);
     setEditingCell(null);
-
-    // Show success toast
-    console.log('✅ Valor guardado:', { ...editingCell, value });
   };
 
   const editingMetric = metrics.find((m) => m.id === editingCell?.metricId);
@@ -270,7 +267,6 @@ export function ByAthleteView({ athletes, metrics, values: propValues, onUpdateV
           </div>
         </div>
       </div>
-
       {/* Grid */}
       <div className="flex-1">
         <DataGrid
@@ -286,7 +282,6 @@ export function ByAthleteView({ athletes, metrics, values: propValues, onUpdateV
               id: 'export',
               label: 'Exportar Selecionados',
               onClick: (rows) => {
-                console.log('Export:', rows);
                 alert(`📊 Exportar ${rows.length} atletas`);
               },
             },
@@ -294,7 +289,6 @@ export function ByAthleteView({ athletes, metrics, values: propValues, onUpdateV
               id: 'message',
               label: 'Enviar Mensagem',
               onClick: (rows) => {
-                console.log('Message:', rows);
                 alert(`✉️ Enviar mensagem para ${rows.length} atletas`);
               },
               variant: 'primary',
@@ -311,7 +305,6 @@ export function ByAthleteView({ athletes, metrics, values: propValues, onUpdateV
           }
         />
       </div>
-
       {/* Inline Cell Editor */}
       <AnimatePresence>
         {editingCell && editingMetric && editingAthlete && (

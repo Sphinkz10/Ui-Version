@@ -104,7 +104,6 @@ export function LiveBoardMain({ onViewMetricHistory, onRefresh, workspaceId, wor
   };
 
   const handleUpdateValue = (athleteId: string, metricId: string, value: any) => {
-    console.log('Update value:', { athleteId, metricId, value });
     // TODO: Integrate with real data store
     alert(`✅ Valor guardado!\n\nAtleta: ${mockAthletes.find((a) => a.id === athleteId)?.name}\nMétrica: ${activeMetrics.find((m) => m.id === metricId)?.name}\nValor: ${value}`);
   };
@@ -371,7 +370,6 @@ export function LiveBoardMain({ onViewMetricHistory, onRefresh, workspaceId, wor
           })}
         </div>
       </div>
-
       {/* Content */}
       <div className="flex-1 overflow-hidden bg-slate-50 p-6">
         {viewMode === 'by-athlete' && (
@@ -392,7 +390,6 @@ export function LiveBoardMain({ onViewMetricHistory, onRefresh, workspaceId, wor
             values={mockMetricValues}
             onViewDetails={onViewMetricHistory}
             onBulkUpdate={(metricId, athleteIds) => {
-              console.log('Bulk update:', { metricId, athleteIds });
               alert(`📨 Enviar notificação para ${athleteIds.length} atletas sobre a métrica ${activeMetrics.find((m) => m.id === metricId)?.name}`);
             }}
             isMobile={isMobile}
@@ -411,7 +408,6 @@ export function LiveBoardMain({ onViewMetricHistory, onRefresh, workspaceId, wor
           />
         )}
       </div>
-
       {/* Alerts Feed (Bottom Right) */}
       {summaryStats.alertsCount > 0 && (
         <motion.div

@@ -61,11 +61,8 @@ export function ScheduleWorkoutModal({
       }
     };
 
-    // Simular criação (em produção: API call)
-    console.log('📅 Creating calendar event:', event);
-    
     toast.success(`Treino "${workout.name}" agendado para ${format(startDate, "d 'de' MMMM 'às' HH:mm", { locale: pt })}`);
-    
+
     onScheduled?.(event);
     onClose();
     resetForm();

@@ -169,7 +169,6 @@ export function useFormSubmission(options: UseFormSubmissionOptions): UseFormSub
       }
 
       const result = await response.json();
-      console.log('✅ Form submitted successfully:', result);
 
       // Map API response to SubmissionResult
       const submissionResult: SubmissionResult = {
@@ -182,11 +181,10 @@ export function useFormSubmission(options: UseFormSubmissionOptions): UseFormSub
 
       // Handle success
       setResult(submissionResult);
-      
+
       if (onSuccess) {
         onSuccess(submissionResult);
       }
-
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       console.error('❌ Form submission failed:', errorMessage);
@@ -516,8 +514,6 @@ function extractMetricUpdates(
           link.transformFunction,
           link.transformParams
         );
-        // FIX #6: Log successful transformation for debugging
-        console.log(`Transformed ${link.fieldName}: ${rawValue} → ${finalValue}`);
       } catch (err) {
         // FIX #6: Better error tracking for transformation failures
         const errorMsg = err instanceof Error ? err.message : 'Unknown error';

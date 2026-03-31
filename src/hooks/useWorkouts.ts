@@ -69,7 +69,7 @@ interface UseWorkoutsReturn {
   workouts: Workout[];
   loading: boolean;
   error: string | null;
-  fetchWorkouts: () => Promise<void>;
+  fetchWorkouts: (signal?: AbortSignal) => Promise<void>;
   createWorkout: (data: Partial<Workout>) => Promise<Workout | null>;
   updateWorkout: (id: string, data: Partial<Workout>) => Promise<boolean>;
   deleteWorkout: (id: string) => Promise<boolean>;
@@ -93,16 +93,16 @@ export function useWorkouts({
   // ============================================================================
   // FETCH WORKOUTS
   // ============================================================================
-  const fetchWorkouts = useCallback(async () => {
+  const fetchWorkouts = useCallback(async (signal?: AbortSignal) => {
     try {
       const isInitialLoad = workouts.length === 0;
-      
+
       if (isInitialLoad) {
         setLoading(true);
       } else {
         setRefreshing(true);
       }
-      
+
       setError(null);
 
       const params = new URLSearchParams({
@@ -112,18 +112,18 @@ export function useWorkouts({
         ...(search && { search })
       });
 
-      const response = await fetch(`/app/api/workouts?${params}`);
-      
+      const response = await fetch(`/app/api/workouts?${params}`, { signal });
+
       if (!response.ok) {
         throw new Error(`Failed to fetch workouts: ${response.statusText}`);
       }
 
       const data = await response.json();
       setWorkouts(data.workouts || []);
-      
-      console.log(`✅ [useWorkouts] Loaded ${data.workouts?.length || 0} workouts`);
-
     } catch (err: any) {
+      if (err.name === 'AbortError') {
+        return; // Ignora o erro se o request foi abortado
+      }
       console.error('❌ [useWorkouts] Error:', err);
       setError(err.message);
       toast.error('Erro ao carregar treinos', {
@@ -137,10 +137,16 @@ export function useWorkouts({
 
   // Auto-fetch on mount
   useEffect(() => {
+    const controller = new AbortController();
+
     if (autoFetch) {
-      fetchWorkouts();
+      fetchWorkouts(controller.signal);
     }
-  }, [autoFetch, category, isTemplate, search]);
+
+    return () => {
+      controller.abort();
+    };
+  }, [autoFetch, category, isTemplate, search, fetchWorkouts]);
 
   // ============================================================================
   // CREATE WORKOUT

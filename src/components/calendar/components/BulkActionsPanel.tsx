@@ -186,10 +186,7 @@ export function BulkActionsPanel({
                     label="Tags"
                     color="sky"
                     disabled={isProcessing}
-                    onClick={() => {
-                      // Open tag modal (would be implemented)
-                      console.log('Add tags to', selectedIds);
-                    }}
+                    onClick={() => {}}
                   />
 
                   {/* Assign Athletes */}
@@ -198,10 +195,7 @@ export function BulkActionsPanel({
                     label="Atletas"
                     color="violet"
                     disabled={isProcessing}
-                    onClick={() => {
-                      // Open athlete selector (would be implemented)
-                      console.log('Assign athletes to', selectedIds);
-                    }}
+                    onClick={() => {}}
                   />
                 </div>
               </motion.div>

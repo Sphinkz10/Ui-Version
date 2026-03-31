@@ -158,16 +158,6 @@ export function SmartSchedulingWizard({
         status: 'draft' as const
       };
 
-      // TODO: Supabase upsert
-      // const { data, error } = await supabase
-      //   .from('schedule_wizards')
-      //   .upsert({
-      //     id: state.wizardId,
-      //     ...draftData
-      //   });
-
-      console.log('Draft saved:', draftData);
-
       updateState({ isDirty: false });
 
       if (!silent) {
@@ -189,15 +179,6 @@ export function SmartSchedulingWizard({
    */
   const loadDraft = async (draftId: string) => {
     try {
-      // TODO: Supabase fetch
-      // const { data, error } = await supabase
-      //   .from('schedule_wizards')
-      //   .select('*')
-      //   .eq('id', draftId)
-      //   .single();
-
-      console.log('Loading draft:', draftId);
-
       // Mock: carregar do localStorage para demo
       const savedDraft = localStorage.getItem(`wizard_draft_${draftId}`);
       if (savedDraft) {
@@ -220,19 +201,6 @@ export function SmartSchedulingWizard({
   const handleCommit = async () => {
     try {
       updateState({ isGenerating: true });
-
-      // TODO: Chamar RPC batch_commit_schedule
-      // const { data, error } = await supabase.rpc('batch_commit_schedule', {
-      //   p_wizard_id: state.wizardId,
-      //   p_proposals: state.proposals.map(...),
-      //   p_options: state.commitOptions
-      // });
-
-      console.log('Committing wizard...', {
-        wizardId: state.wizardId,
-        proposalCount: state.proposals.length,
-        options: state.commitOptions
-      });
 
       // Mock success
       const mockPlanRunId = 'plan-run-' + Date.now();
@@ -267,13 +235,6 @@ export function SmartSchedulingWizard({
     if (!lastPlanRunId) return;
 
     try {
-      // TODO: Chamar RPC undo_plan_run
-      // const { data, error } = await supabase.rpc('undo_plan_run', {
-      //   p_plan_run_id: lastPlanRunId
-      // });
-
-      console.log('Undoing plan run:', lastPlanRunId);
-
       setShowUndoToast(false);
       alert('Plano desfeito com sucesso!');
     } catch (error) {

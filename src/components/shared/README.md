@@ -322,7 +322,7 @@ Sistema de cards adaptativos com múltiplas variantes especializadas.
 import { AdaptiveCard } from '@/components/shared/AdaptiveCard';
 
 <AdaptiveCard
-  onClick={() => console.log('clicked')}
+  onClick={() => undefined}
   hover={true}
   border={true}
   shadow="md" // none | sm | md | lg

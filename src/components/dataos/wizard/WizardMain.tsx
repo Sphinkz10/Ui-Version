@@ -506,7 +506,7 @@ export function WizardMain({
                   />
                 ) : isMobile ? (
                   // ✨ Mobile: swipeable
-                  <motion.div
+                  (<motion.div
                     key={`step-${currentStep}`}
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
@@ -520,16 +520,16 @@ export function WizardMain({
                       updateData={updateData}
                       isMobile={isMobile}
                     />
-                  </motion.div>
+                  </motion.div>)
                 ) : (
                   // Desktop: no swipe
-                  <FullWizardStep
+                  (<FullWizardStep
                     key={`step-${currentStep}`}
                     step={currentStep}
                     data={data}
                     updateData={updateData}
                     isMobile={isMobile}
-                  />
+                  />)
                 )}
               </AnimatePresence>
             </div>
@@ -627,9 +627,7 @@ export function WizardMain({
           )}
         </div>
       </ResponsiveModal>
-
       {/* ✨ ADVANCED FEATURES MODALS */}
-      
       {/* Draft Recovery */}
       <AnimatePresence>
         {showDraftRecovery && (
@@ -640,7 +638,6 @@ export function WizardMain({
           />
         )}
       </AnimatePresence>
-
       {/* Export Modal */}
       <AnimatePresence>
         {showExport && (
@@ -652,7 +649,6 @@ export function WizardMain({
           />
         )}
       </AnimatePresence>
-
       {/* Import Modal */}
       <AnimatePresence>
         {showImport && (
@@ -663,7 +659,6 @@ export function WizardMain({
           />
         )}
       </AnimatePresence>
-
       {/* Post-Creation Modal */}
       <AnimatePresence>
         {showPostCreation && (
@@ -671,20 +666,14 @@ export function WizardMain({
             isOpen={showPostCreation}
             metricName={data.name}
             onAddValue={() => {
-              // TODO: Navigate to manual entry
-              console.log('Navigate to manual entry');
               setShowPostCreation(false);
               onClose();
             }}
             onConfigureAutomation={() => {
-              // TODO: Navigate to automation
-              console.log('Navigate to automation');
               setShowPostCreation(false);
               onClose();
             }}
             onGoToLibrary={() => {
-              // TODO: Navigate to library
-              console.log('Navigate to library');
               setShowPostCreation(false);
               onClose();
             }}

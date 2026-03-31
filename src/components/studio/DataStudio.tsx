@@ -48,12 +48,10 @@ export function DataStudio({ onBack }: DataStudioProps) {
   ];
 
   const handleApplyScenario = async (scenario: any) => {
-    console.log('Aplicando cenário:', scenario);
-    
     // TODO: Integração com backend
     // POST /api/workout/apply-quantum-scenario
     // Body: scenario data
-    
+
     // Simulação de sucesso
     alert(`✅ Cenário "${scenario.name}" aplicado com sucesso!
 
@@ -131,19 +129,18 @@ export function DataStudio({ onBack }: DataStudioProps) {
           ))}
         </div>
       </div>
-
       {/* Content - Scroll Area with pb for mobile nav */}
       <div className="flex-1 overflow-y-auto pb-20 lg:pb-6">
         <div className="p-4 sm:p-6">
           {dataView === 'predictive' ? (
             /* MODO PREDITIVO - Quantum Forecast */
-            <QuantumForecast 
+            (<QuantumForecast
               historicalData={performanceData}
               onApplyScenario={handleApplyScenario} 
-            />
+            />)
           ) : (
             /* MODOS REALTIME E HISTORICAL */
-            <div className="max-w-7xl mx-auto space-y-6">
+            (<div className="max-w-7xl mx-auto space-y-6">
               {/* Main Performance Chart */}
               <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
@@ -191,7 +188,6 @@ export function DataStudio({ onBack }: DataStudioProps) {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Real-time Power */}
                 <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
@@ -253,7 +249,6 @@ export function DataStudio({ onBack }: DataStudioProps) {
                   </div>
                 </div>
               </div>
-
               {/* Correlations */}
               <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
                 <h3 className="text-slate-900 mb-4">🔗 Correlações Detectadas</h3>
@@ -284,7 +279,6 @@ export function DataStudio({ onBack }: DataStudioProps) {
                   ))}
                 </div>
               </div>
-
               {/* Insights */}
               <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-200 p-6">
                 <div className="flex items-center gap-2 mb-4">
@@ -328,7 +322,7 @@ export function DataStudio({ onBack }: DataStudioProps) {
                   </div>
                 </div>
               </div>
-            </div>
+            </div>)
           )}
         </div>
       </div>

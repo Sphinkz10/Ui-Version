@@ -127,8 +127,6 @@ export function NotificationPanel({
     // Navigate if has action URL
     if (notification.actionUrl) {
       onNotificationClick?.(notification.id);
-      // TODO: Add navigation logic
-      console.log('Navigate to:', notification.actionUrl);
     }
   };
 

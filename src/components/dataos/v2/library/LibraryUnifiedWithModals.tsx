@@ -103,8 +103,6 @@ export function LibraryUnifiedWithModals({
   };
 
   const performSoftDelete = (metric: Metric) => {
-    // TODO: API call
-    console.log('Soft delete:', metric.id);
     toast.success(`✅ Métrica "${metric.name}" arquivada com sucesso!`, {
       description: 'Pode ser restaurada a qualquer momento em "Arquivadas"',
     });
@@ -112,8 +110,6 @@ export function LibraryUnifiedWithModals({
   };
 
   const performHardDelete = (metric: Metric, deleteData: boolean) => {
-    // TODO: API call
-    console.log('Hard delete:', metric.id, 'deleteData:', deleteData);
     toast.success(`🗑️ Métrica "${metric.name}" apagada permanentemente!`, {
       description: deleteData ? 'Dados históricos também removidos' : 'Dados históricos mantidos',
     });
@@ -130,8 +126,6 @@ export function LibraryUnifiedWithModals({
   };
 
   const handleBulkDeleteConfirm = (deleteType: 'soft' | 'hard') => {
-    // TODO: API call
-    console.log('Bulk delete:', selectedMetrics.length, 'type:', deleteType);
     toast.success(
       `✅ ${selectedMetrics.length} métricas ${
         deleteType === 'soft' ? 'arquivadas' : 'apagadas'
@@ -308,7 +302,6 @@ export function LibraryUnifiedWithModals({
       <LibraryUnified
         onCreateMetric={onCreateMetric}
         onEdit={(metric) => {
-          console.log('Edit metric:', metric);
           toast.info('🔄 Edit modal coming soon...');
         }}
         onDelete={handleDeleteClick}
@@ -316,7 +309,6 @@ export function LibraryUnifiedWithModals({
         workspaceId={workspaceId}
         workspaceName={workspaceName}
       />
-
       {/* Delete Modal */}
       {deleteModalOpen && selectedMetric && (
         <DeleteMetricModal
@@ -335,7 +327,6 @@ export function LibraryUnifiedWithModals({
           onConfirm={handleDeleteConfirm}
         />
       )}
-
       {/* Bulk Delete Modal */}
       {bulkDeleteModalOpen && (
         <BulkDeleteModal
@@ -354,7 +345,6 @@ export function LibraryUnifiedWithModals({
           onConfirm={handleBulkDeleteConfirm}
         />
       )}
-
       {/* Hard Delete Confirmation */}
       {hardDeleteConfirmOpen && selectedMetric && pendingHardDelete && (
         <HardDeleteConfirmation
@@ -372,7 +362,6 @@ export function LibraryUnifiedWithModals({
           onConfirm={handleHardDeleteConfirm}
         />
       )}
-
       {/* Blocked Delete Modal */}
       {blockedDeleteModalOpen && selectedMetric && (
         <BlockedDeleteModal
@@ -388,7 +377,6 @@ export function LibraryUnifiedWithModals({
           onManageAutomations={handleManageAutomations}
         />
       )}
-
       {/* History Panel */}
       {historyPanelOpen && selectedMetric && (
         <MetricHistoryPanel
@@ -404,7 +392,6 @@ export function LibraryUnifiedWithModals({
           onExport={handleExportHistory}
         />
       )}
-
       {/* History Export Modal */}
       {historyExportModalOpen && selectedMetric && (
         <HistoryExportModal

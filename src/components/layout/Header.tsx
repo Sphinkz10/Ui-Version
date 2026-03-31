@@ -269,7 +269,6 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
             workspaceId={`workspace-${currentWorkspace.id}`}
             userId="user-demo"
             onNotificationClick={(id) => {
-              console.log('Notification clicked:', id);
               onNotificationsOpen();
             }}
           />
@@ -292,7 +291,6 @@ export function Header({ onSearchOpen, onNotificationsOpen, onMessagesOpen, onWo
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              console.log('🔧 Settings button clicked!');
               onWorkspaceSettings();
             }}
             className="h-9 w-9 rounded-xl bg-slate-50 flex items-center justify-center hover:bg-slate-100 transition-colors"

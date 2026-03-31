@@ -231,13 +231,6 @@ export function usePerformanceProfiler(componentName: string) {
           renderTimesRef.current.reduce((sum, time) => sum + time, 0) /
           renderTimesRef.current.length;
         const maxRenderTime = Math.max(...renderTimesRef.current);
-
-        console.log(
-          `[Performance] ${componentName} stats (last 100 renders):`,
-          `\n  Avg: ${avgRenderTime.toFixed(2)}ms`,
-          `\n  Max: ${maxRenderTime.toFixed(2)}ms`,
-          `\n  Total renders: ${renderCountRef.current}`
-        );
       }
     };
   });
