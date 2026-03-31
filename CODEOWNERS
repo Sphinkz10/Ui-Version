@@ -1,0 +1,6 @@
+# These owners will be the default owners for everything in the repository.
+*       @ruida
+
+# These owners will be the default owners for specific paths.
+src/    @ruida
+.github/ @ruida
