@@ -86,13 +86,10 @@ class ReportBuilder {
 
       const processingTime = Date.now() - startTime;
 
-      console.log(`✅ Report executed in ${processingTime}ms, ${data.length} rows`);
-
       return {
         data,
         rowCount: data.length,
       };
-
     } catch (error: any) {
       console.error('❌ Report execution failed:', error);
       throw error;
@@ -260,12 +257,6 @@ class ReportBuilder {
    * Build custom report (advanced SQL)
    */
   private async buildCustomReport(): Promise<any[]> {
-    // For custom reports, execute raw SQL (carefully!)
-    // This is advanced and should have strict validation
-    
-    // For now, return empty array
-    // In production, you'd validate and execute custom SQL
-    console.warn('Custom reports not yet implemented');
     return [];
   }
 

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
   try {
     // Parse request body
     const body: TriggerEngineRequest = await request.json();
-    
+
     // Validate workspaceId
     if (!body.workspaceId) {
       return NextResponse.json(
@@ -47,11 +47,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     // Check if specific athlete requested (faster)
     if (body.athleteIds && body.athleteIds.length === 1) {
-      console.log(`[API] Evaluating single athlete: ${body.athleteIds[0]}`);
-      
       const decisions = await runDecisionEngineForAthlete(
         body.athleteIds[0],
         body.workspaceId,
@@ -60,7 +58,7 @@ export async function POST(request: NextRequest) {
           dryRun: true, // Always dry run for single athlete
         }
       );
-      
+
       return NextResponse.json(
         {
           success: true,
@@ -72,25 +70,14 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
     }
-    
-    // Run full engine
-    console.log(`[API] Triggering decision engine for workspace: ${body.workspaceId}`);
-    
+
     const result: EngineRunResult = await runDecisionEngine(body.workspaceId, {
       athleteIds: body.athleteIds,
       ruleIds: body.ruleIds,
       skipCooldown: body.force,
       dryRun: false, // Actually save decisions
     });
-    
-    // Log result
-    console.log(`[API] Engine run completed:`, {
-      athletes: result.athletesEvaluated,
-      decisions: result.decisionsCreated,
-      errors: result.errors.length,
-      duration: result.duration,
-    });
-    
+
     // Return result
     return NextResponse.json(
       {
@@ -99,7 +86,6 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     );
-    
   } catch (error) {
     console.error('[API] Error triggering engine:', error);
     
@@ -129,10 +115,8 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    console.log('[API] Checking engine health...');
-    
     const health = await checkEngineHealth();
-    
+
     const response = {
       healthy: health.healthy,
       timestamp: new Date().toISOString(),
@@ -141,11 +125,10 @@ export async function GET(request: NextRequest) {
       version: '1.0.0',
       uptime: process.uptime(),
     };
-    
+
     const statusCode = health.healthy ? 200 : 503;
-    
+
     return NextResponse.json(response, { status: statusCode });
-    
   } catch (error) {
     console.error('[API] Error checking engine health:', error);
     

@@ -105,11 +105,9 @@ async function checkCache(
       .eq('workspace_id', workspaceId)
       .eq('cache_key', cacheKey);
 
-    console.log(`✅ Cache HIT for ${cacheKey}`);
     return cached.data;
   }
 
-  console.log(`⚠️ Cache MISS for ${cacheKey}`);
   return null;
 }
 
@@ -140,8 +138,6 @@ async function saveCache(
     }, {
       onConflict: 'workspace_id,cache_key',
     });
-
-  console.log(`💾 Cache SAVED for ${cacheKey} (expires in ${ttlMinutes}m)`);
 }
 
 // ============================================================================
@@ -354,8 +350,6 @@ export async function GET(request: NextRequest) {
     const useMockData = totalSessions === 0 || !totalSessions;
 
     if (useMockData) {
-      console.log('📊 Using MOCK data for dashboard (DB is empty)');
-      
       return NextResponse.json({
         attendance: {
           present: 24,

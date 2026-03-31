@@ -17,7 +17,7 @@ import { createClient } from '@/utils/supabase/server';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const workspaceId = searchParams.get('workspaceId');
     const athleteId = searchParams.get('athleteId');
     const metricId = searchParams.get('metricId');
@@ -67,15 +67,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Fetched ${updates?.length || 0} metric updates`);
-
     return NextResponse.json({
       updates: updates || [],
       count: count || 0,
       limit,
       offset,
     });
-
   } catch (error: any) {
     console.error('Unexpected error in GET /api/metric-updates:', error);
     return NextResponse.json(
@@ -160,13 +157,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Created metric update: ${update.id}`);
-
     return NextResponse.json({ 
       update,
       message: 'Metric update created successfully' 
     });
-
   } catch (error: any) {
     console.error('Unexpected error in POST /api/metric-updates:', error);
     return NextResponse.json(

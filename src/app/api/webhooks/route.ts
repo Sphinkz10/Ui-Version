@@ -276,9 +276,6 @@ async function testWebhook(webhookId: string, url: string, secret: string): Prom
       body: JSON.stringify(testPayload),
       signal: AbortSignal.timeout(10000), // 10s timeout for test
     });
-
-    console.log(`✅ Test webhook sent: ${response.status} ${response.statusText}`);
-
   } catch (error: any) {
     console.error('❌ Test webhook failed:', error.message);
     throw error;

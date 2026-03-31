@@ -196,13 +196,11 @@ export async function POST(request: NextRequest) {
       // Non-fatal, continue without links
     }
 
-    console.log(`📋 [Submission] Form: ${form.title}, Links: ${metricLinks?.length || 0}`);
-
     // ========================================================================
     // STEP 3: Validate all responses
     // ========================================================================
     const validationErrors: Record<string, string[]> = {};
-    
+
     for (const [fieldId, value] of Object.entries(responses)) {
       const field = form.fields?.find((f: any) => f.id === fieldId);
       if (!field) continue;
@@ -285,8 +283,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log(`✅ [Transformation] Processed ${processingLog.length} fields, ${metricUpdatesToCreate.length} metrics`);
-
     // ========================================================================
     // STEP 5: Save submission
     // ========================================================================
@@ -316,7 +312,7 @@ export async function POST(request: NextRequest) {
     // STEP 6: Create metric updates with source_id
     // ========================================================================
     let createdMetrics = 0;
-    
+
     if (metricUpdatesToCreate.length > 0) {
       // Set source_id to submission id
       const updates = metricUpdatesToCreate.map(update => ({
@@ -334,7 +330,6 @@ export async function POST(request: NextRequest) {
         // Non-fatal, submission already saved
       } else {
         createdMetrics = metrics?.length || 0;
-        console.log(`✅ [Metrics] Created ${createdMetrics} metric updates`);
       }
     }
 
@@ -347,7 +342,6 @@ export async function POST(request: NextRequest) {
       processingLog,
       message: `Form submitted successfully. ${createdMetrics} metrics created.`
     });
-
   } catch (error: any) {
     console.error('Unexpected error in POST /api/forms/submissions:', error);
     return NextResponse.json(
@@ -363,7 +357,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const workspaceId = searchParams.get('workspaceId');
     const formId = searchParams.get('formId');
     const athleteId = searchParams.get('athleteId');
@@ -417,15 +411,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Fetched ${submissions?.length || 0} submissions`);
-
     return NextResponse.json({
       submissions: submissions || [],
       count: count || 0,
       limit,
       offset
     });
-
   } catch (error: any) {
     console.error('Unexpected error in GET /api/forms/submissions:', error);
     return NextResponse.json(

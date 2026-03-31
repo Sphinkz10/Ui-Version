@@ -93,8 +93,6 @@ async function executeAction(
 ): Promise<ExecutionResult> {
   const { type, params } = actionConfig;
 
-  console.log(`⚡ [Action] Executing: ${type}`);
-
   try {
     switch (type) {
       case 'send_notification':
@@ -125,13 +123,11 @@ async function executeAction(
 
 // Action implementations
 async function sendNotification(params: any, context: ExecutionContext): Promise<ExecutionResult> {
-  console.log(`📬 [Notification] Sending: ${params.message}`);
-  
   // In production, this would:
   // 1. Create notification record
   // 2. Send push notification
   // 3. Send in-app notification
-  
+
   return {
     success: true,
     output: {
@@ -143,13 +139,11 @@ async function sendNotification(params: any, context: ExecutionContext): Promise
 }
 
 async function updateMetric(params: any, context: ExecutionContext): Promise<ExecutionResult> {
-  console.log(`📊 [Metric] Updating: ${params.metric_id}`);
-  
   // In production, this would:
   // 1. Validate metric exists
   // 2. Create metric_update
   // 3. Recalculate baselines if needed
-  
+
   return {
     success: true,
     output: {
@@ -161,13 +155,11 @@ async function updateMetric(params: any, context: ExecutionContext): Promise<Exe
 }
 
 async function createEvent(params: any, context: ExecutionContext): Promise<ExecutionResult> {
-  console.log(`📅 [Event] Creating: ${params.title}`);
-  
   // In production, this would:
   // 1. Create calendar_event
   // 2. Send notifications
   // 3. Update athlete schedule
-  
+
   return {
     success: true,
     output: {
@@ -179,13 +171,11 @@ async function createEvent(params: any, context: ExecutionContext): Promise<Exec
 }
 
 async function sendEmail(params: any, context: ExecutionContext): Promise<ExecutionResult> {
-  console.log(`📧 [Email] Sending to: ${params.to}`);
-  
   // In production, this would:
   // 1. Use email service (SendGrid, etc)
   // 2. Apply template
   // 3. Send email
-  
+
   return {
     success: true,
     output: {
@@ -197,8 +187,6 @@ async function sendEmail(params: any, context: ExecutionContext): Promise<Execut
 }
 
 async function callWebhook(params: any, context: ExecutionContext): Promise<ExecutionResult> {
-  console.log(`🔗 [Webhook] Calling: ${params.url}`);
-  
   try {
     const response = await fetch(params.url, {
       method: params.method || 'POST',
@@ -262,8 +250,6 @@ export async function POST(
       );
     }
 
-    console.log(`⚡ [Execute] Rule: ${rule.name}, Type: ${execution_type}`);
-
     // Check if rule is active (unless test mode)
     if (!rule.is_active && !is_test) {
       return NextResponse.json(
@@ -300,8 +286,6 @@ export async function POST(
     const conditionsMet = evaluateConditions(rule.conditions, input_data || {});
 
     if (!conditionsMet) {
-      console.log(`⚠️ [Execute] Conditions not met, skipping action`);
-
       await supabase
         .from('automation_executions')
         .update({
@@ -357,11 +341,6 @@ export async function POST(
       });
     }
 
-    // ========================================================================
-    // STEP 7: Return result
-    // ========================================================================
-    console.log(`✅ [Execute] ${result.success ? 'Success' : 'Failed'} in ${executionTime}ms`);
-
     return NextResponse.json({
       execution: {
         ...execution,
@@ -378,7 +357,6 @@ export async function POST(
         ? 'Automation executed successfully' 
         : 'Automation execution failed'
     });
-
   } catch (error: any) {
     console.error('❌ [Execute] Unexpected error:', error);
     return NextResponse.json(

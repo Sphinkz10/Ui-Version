@@ -11,7 +11,7 @@ import * as kv from '@/supabase/functions/server/kv_store';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     const {
       formId,
       athleteId,
@@ -27,8 +27,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.log(`📝 Processing form submission: formId=${formId}, athleteId=${athleteId}`);
 
     // ==================================================
     // 1. SAVE FORM SUBMISSION
@@ -50,26 +48,22 @@ export async function POST(request: NextRequest) {
     await kv.set(`submission:${submissionId}`, submission);
 
     // Index by athlete
-    const athleteSubmissions = await kv.get(`athlete:${athleteId}:submissions`) || [];
+    const athleteSubmissions = (await kv.get(`athlete:${athleteId}:submissions`)) || [];
     athleteSubmissions.push(submissionId);
     await kv.set(`athlete:${athleteId}:submissions`, athleteSubmissions);
 
     // Index by form
-    const formSubmissions = await kv.get(`form:${formId}:submissions`) || [];
+    const formSubmissions = (await kv.get(`form:${formId}:submissions`)) || [];
     formSubmissions.push(submissionId);
     await kv.set(`form:${formId}:submissions`, formSubmissions);
-
-    console.log(`✅ Submission saved: ${submissionId}`);
 
     // ==================================================
     // 2. FETCH FORM_FIELD_METRIC_LINKS FOR THIS FORM
     // ==================================================
     const linksKey = `form:${formId}:metric_links`;
-    const links = await kv.get(linksKey) || [];
+    const links = (await kv.get(linksKey)) || [];
 
     if (links.length === 0) {
-      console.log(`⚠️ No metric links found for form ${formId} - submission saved but no metrics created`);
-      
       // Mark as processed (no metrics to create)
       submission.processed = true;
       await kv.set(`submission:${submissionId}`, submission);
@@ -88,8 +82,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log(`📊 Found ${links.length} metric links for form ${formId}`);
-
     // ==================================================
     // 3. CREATE METRIC_UPDATES FROM LINKS
     // ==================================================
@@ -100,16 +92,14 @@ export async function POST(request: NextRequest) {
       try {
         // Skip inactive links
         if (!link.isActive) {
-          console.log(`Skipping inactive link: ${link.id}`);
           continue;
         }
 
         // Get field value from submission
         const fieldValue = submissionData[link.fieldId];
-        
+
         // Skip if field not answered
         if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
-          console.log(`No value for field ${link.fieldId} - skipping metric ${link.metricId}`);
           continue;
         }
 
@@ -122,7 +112,6 @@ export async function POST(request: NextRequest) {
               link.transformFunction,
               link.transformParams
             );
-            console.log(`Transformed ${link.fieldId}: ${fieldValue} → ${transformedValue}`);
           } catch (err) {
             const errorMsg = err instanceof Error ? err.message : 'Unknown error';
             console.error(`Transformation failed for field ${link.fieldId}:`, errorMsg);
@@ -137,7 +126,7 @@ export async function POST(request: NextRequest) {
 
         // Create metric_update
         const metricUpdateId = `mu_${Date.now()}_${link.metricId}_${athleteId}`;
-        
+
         const metricUpdate = {
           id: metricUpdateId,
           metric_id: link.metricId,
@@ -154,16 +143,13 @@ export async function POST(request: NextRequest) {
         };
 
         await kv.set(metricUpdateId, metricUpdate);
-        
+
         // Index by athlete
-        const athleteUpdates = await kv.get(`athlete:${athleteId}:metric_updates`) || [];
+        const athleteUpdates = (await kv.get(`athlete:${athleteId}:metric_updates`)) || [];
         athleteUpdates.push(metricUpdateId);
         await kv.set(`athlete:${athleteId}:metric_updates`, athleteUpdates);
 
         metricUpdates.push(metricUpdate);
-        
-        console.log(`✅ Created metric_update: ${metricUpdateId} (${link.metricId} = ${transformedValue})`);
-
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error';
         console.error(`Error processing link ${link.id}:`, errorMsg);
@@ -182,11 +168,7 @@ export async function POST(request: NextRequest) {
     submission.metricsCreated = metricUpdates.length;
     await kv.set(`submission:${submissionId}`, submission);
 
-    console.log(`✅ Form submission processed successfully`);
-    console.log(`📊 Created ${metricUpdates.length} metric updates`);
-    if (errors.length > 0) {
-      console.warn(`⚠️ ${errors.length} errors occurred during processing`);
-    }
+    if (errors.length > 0) {}
 
     // ==================================================
     // 5. RETURN SUCCESS WITH STATS
@@ -209,7 +191,6 @@ export async function POST(request: NextRequest) {
       })),
       errors,
     });
-
   } catch (error: any) {
     console.error('❌ CRITICAL ERROR processing form submission:', error);
     return NextResponse.json(
@@ -236,7 +217,7 @@ export async function GET(request: NextRequest) {
 
     if (athleteId) {
       // Get submissions for athlete
-      const submissionIds = await kv.get(`athlete:${athleteId}:submissions`) || [];
+      const submissionIds = (await kv.get(`athlete:${athleteId}:submissions`)) || [];
       
       const submissions = await Promise.all(
         submissionIds.map(async (id: string) => {
@@ -258,7 +239,7 @@ export async function GET(request: NextRequest) {
 
     if (formId) {
       // Get submissions for form
-      const submissionIds = await kv.get(`form:${formId}:submissions`) || [];
+      const submissionIds = (await kv.get(`form:${formId}:submissions`)) || [];
       
       const submissions = await Promise.all(
         submissionIds.map(async (id: string) => {
@@ -392,7 +373,6 @@ function applyTransformation(
       return value / 60;
 
     default:
-      console.warn(`Unknown transform function: ${transformFunction}`);
       return value;
   }
 }

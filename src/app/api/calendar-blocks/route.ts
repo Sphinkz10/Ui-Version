@@ -64,17 +64,15 @@ export async function GET(request: NextRequest) {
     const useMockData = !blocks || blocks.length === 0;
 
     if (useMockData) {
-      console.log('📅 Using MOCK data for calendar blocks (DB is empty)');
-      
       const now = new Date();
       const today = now.toISOString().split('T')[0];
-      
+
       // 🔧 FIX: Criar bloqueios mais VISÍVEIS
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const day = String(now.getDate()).padStart(2, '0');
       const todayLocal = `${year}-${month}-${day}`;
-      
+
       const mockBlocks = [
         // Bloqueio pontual de manutenção (12h-13h hoje)
         {
@@ -113,11 +111,11 @@ export async function GET(request: NextRequest) {
 
       // Filter by date range
       let filteredBlocks = mockBlocks;
-      
+
       if (startDate) {
         filteredBlocks = filteredBlocks.filter(b => b.start_date >= startDate);
       }
-      
+
       if (endDate) {
         filteredBlocks = filteredBlocks.filter(b => b.start_date <= endDate);
       }

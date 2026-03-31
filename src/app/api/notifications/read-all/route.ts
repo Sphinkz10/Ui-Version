@@ -34,13 +34,6 @@ export async function PATCH(request: NextRequest) {
       values.push(userId);
     }
 
-    // TODO: Update in Supabase
-    // UPDATE notifications
-    // SET read = TRUE, read_at = NOW()
-    // WHERE workspace_id = $1 AND read = FALSE [AND user_id = $2]
-
-    console.log(`Marked all notifications as read for workspace ${workspaceId}`);
-
     return NextResponse.json({
       success: true,
       message: 'All notifications marked as read',

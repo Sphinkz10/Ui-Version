@@ -90,12 +90,6 @@ export async function DELETE(
       );
     }
 
-    // ⚠️ WARNING: Deleting snapshots is generally NOT recommended
-    // Consider soft delete or archiving instead
-    // For now, we'll allow hard delete but log it
-
-    console.warn(`⚠️ DELETING SNAPSHOT: ${id} by user ${user.id}`);
-
     // Delete metrics first (foreign key constraint)
     const { error: metricsError } = await supabase
       .from('snapshot_metrics')
@@ -125,7 +119,6 @@ export async function DELETE(
       message: 'Snapshot deleted successfully',
       id
     });
-
   } catch (error: any) {
     console.error('Unexpected error in DELETE /api/session-snapshots/[id]:', error);
     return NextResponse.json(

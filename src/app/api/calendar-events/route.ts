@@ -207,13 +207,7 @@ export async function POST(request: NextRequest) {
           p_exclude_event_id: null,
         });
 
-      if (conflictError) {
-        console.warn('Error checking conflicts:', conflictError);
-        // Don't fail the request, just log
-      } else if (conflicts && conflicts.length > 0) {
-        console.warn(`Found ${conflicts.length} scheduling conflicts`);
-        // Could return warning in response
-      }
+      if (conflictError) {} else if (conflicts && conflicts.length > 0) {}
     }
 
     // ==============================================================
@@ -271,9 +265,7 @@ export async function POST(request: NextRequest) {
         console.error('Error creating event participants:', participantsError);
         // Don't fail the whole request, just log
         // The event was created successfully with athlete_ids (legacy support)
-      } else {
-        console.log(`✅ Created ${participants.length} event participants`);
-      }
+      } else {}
     }
 
     // ==============================================================
@@ -283,8 +275,6 @@ export async function POST(request: NextRequest) {
     
     if (body.recurrencePattern && body.recurrencePattern.frequency !== 'none') {
       try {
-        console.log('🔄 Expanding recurrence pattern...');
-        
         // Generate instances
         const instances = generateInstances(
           startDate,
@@ -292,9 +282,7 @@ export async function POST(request: NextRequest) {
           body.recurrencePattern as RecurrencePattern,
           365 // Max instances
         );
-        
-        console.log(`📅 Generated ${instances.length} recurrence instances`);
-        
+
         if (instances.length > 0) {
           // Convert pattern to RRULE
           const rrule = patternToRRule(body.recurrencePattern as RecurrencePattern);
@@ -345,8 +333,7 @@ export async function POST(request: NextRequest) {
               // Don't fail parent event creation
             } else {
               instancesCreated = createdInstances?.length || 0;
-              console.log(`✅ Created ${instancesCreated} recurrence instances`);
-              
+
               // Create participants for each instance
               if (body.athleteIds && Array.isArray(body.athleteIds) && body.athleteIds.length > 0) {
                 const allInstanceParticipants = createdInstances.flatMap(inst =>
@@ -356,12 +343,10 @@ export async function POST(request: NextRequest) {
                     status: 'pending',
                   }))
                 );
-                
+
                 await supabase
                   .from('event_participants')
                   .insert(allInstanceParticipants);
-                
-                console.log(`✅ Created participants for ${instancesCreated} instance events`);
               }
             }
           }

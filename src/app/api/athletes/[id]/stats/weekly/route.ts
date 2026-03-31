@@ -8,8 +8,6 @@ export async function GET(
   try {
     const params = await context.params;
     const athleteId = params.id;
-    
-    console.log('📊 [Weekly Stats] Calculating for athlete:', athleteId);
 
     const supabase = await createClient();
 
@@ -18,7 +16,7 @@ export async function GET(
     // ============================================================
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
+
     const periodStart = weekAgo.toISOString();
     const periodEnd = now.toISOString();
 
@@ -47,7 +45,7 @@ export async function GET(
     const relevantMetrics = (metrics || []).filter((m: any) => 
       readinessMetrics.some(rm => m.metrics.name?.toLowerCase().includes(rm))
     );
-    
+
     let readiness_score = 75; // Default
     if (relevantMetrics.length > 0) {
       const avgValue = relevantMetrics.reduce((sum: number, m: any) => sum + (m.value_numeric || 0), 0) / relevantMetrics.length;
@@ -75,8 +73,6 @@ export async function GET(
       .gte('scheduled_date', weekAgo.toISOString().split('T')[0])
       .lte('scheduled_date', now.toISOString().split('T')[0])
       .order('scheduled_date', { ascending: false });
-
-    console.log('📊 [Weekly Stats] Found sessions:', sessions?.length || 0);
 
     // Calculate weekly load (sum of volume from completed sessions)
     const completedSessions = (sessions || []).filter((s: any) => s.status === 'completed');
@@ -201,10 +197,7 @@ export async function GET(
       }
     };
 
-    console.log('✅ [Weekly Stats] Calculated stats:', response.kpis);
-
     return NextResponse.json(response);
-
   } catch (error: any) {
     console.error('❌ [Weekly Stats] Error:', error);
     

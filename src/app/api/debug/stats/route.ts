@@ -3,8 +3,6 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const athleteId = searchParams.get('athleteId') || 'athlete-1';
-  
-  console.log('🔍 DEBUG Stats API called for:', athleteId);
 
   const response = {
     athlete_id: athleteId,

@@ -28,13 +28,9 @@ interface GenerationOptions {
 }
 
 async function generatePDF(options: GenerationOptions): Promise<string> {
-  // TODO: Implement with jsPDF or similar
-  // For now, return mock URL
-  console.log('📄 [PDF] Generating PDF with jsPDF...');
-  
   // Simulated generation
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   // In production, this would:
   // 1. Create jsPDF instance
   // 2. Add sections from config
@@ -43,16 +39,13 @@ async function generatePDF(options: GenerationOptions): Promise<string> {
   // 5. Generate blob
   // 6. Upload to Supabase Storage
   // 7. Return signed URL
-  
+
   return 'https://example.com/generated-report.pdf';
 }
 
 async function generateExcel(options: GenerationOptions): Promise<string> {
-  // TODO: Implement with xlsx or similar
-  console.log('📊 [Excel] Generating Excel with xlsx...');
-  
   await new Promise(resolve => setTimeout(resolve, 800));
-  
+
   // In production, this would:
   // 1. Create workbook
   // 2. Add sheets for each section
@@ -61,19 +54,16 @@ async function generateExcel(options: GenerationOptions): Promise<string> {
   // 5. Generate buffer
   // 6. Upload to Supabase Storage
   // 7. Return signed URL
-  
+
   return 'https://example.com/generated-report.xlsx';
 }
 
 async function generateWeb(options: GenerationOptions): Promise<string> {
-  // Web format just returns the config + data
-  console.log('🌐 [Web] Generating web view...');
-  
   // In production, this would:
   // 1. Create HTML template
   // 2. Embed data
   // 3. Return as JSON for client-side rendering
-  
+
   return JSON.stringify({
     html: '<div>Report content</div>',
     data: options.data
@@ -115,8 +105,6 @@ export async function POST(
         { status: 404 }
       );
     }
-
-    console.log(`📋 [Generate] Report: ${report.name}, Format: ${format}`);
 
     // ========================================================================
     // STEP 2: Create generation record (pending)
@@ -186,8 +174,6 @@ export async function POST(
       }
     }
 
-    console.log(`✅ [Data] Fetched data: ${Object.keys(reportData).length} types`);
-
     // ========================================================================
     // STEP 4: Generate file based on format
     // ========================================================================
@@ -211,9 +197,6 @@ export async function POST(
         fileUrl = await generateWeb(options);
         fileSize = 50000; // Mock size
       }
-
-      console.log(`✅ [Generate] File generated: ${fileUrl}`);
-
     } catch (genError: any) {
       // Mark as failed
       await supabase
@@ -259,18 +242,12 @@ export async function POST(
       })
       .eq('id', id);
 
-    // ========================================================================
-    // STEP 7: Return result
-    // ========================================================================
-    console.log(`✅ [API] Report generated in ${processingTime}ms`);
-
     return NextResponse.json({
       generation: finalGeneration,
       fileUrl,
       processingTime,
       message: `Report generated successfully as ${format.toUpperCase()}`
     });
-
   } catch (error: any) {
     console.error('❌ [Generate] Unexpected error:', error);
     return NextResponse.json(

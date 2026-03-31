@@ -93,8 +93,6 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    console.log(`✅ Updated parent + ${count || 0} instance events`);
-
     // Update participants if athleteIds changed
     if (updateData.athleteIds) {
       // Get all event IDs in series
@@ -124,8 +122,6 @@ export async function PUT(request: NextRequest) {
         await supabase
           .from('event_participants')
           .insert(newParticipants);
-
-        console.log(`✅ Updated participants for ${eventIds.length} events in series`);
       }
     }
 
@@ -134,7 +130,6 @@ export async function PUT(request: NextRequest) {
       message: `Updated all events in series (${(count || 0) + 1} total)`,
       eventsUpdated: (count || 0) + 1,
     });
-
   } catch (error: any) {
     console.error('Unexpected error in PUT /api/calendar-events/series:', error);
     return NextResponse.json(
@@ -214,14 +209,11 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    console.log(`✅ Deleted entire series: ${totalToDelete} events`);
-
     return NextResponse.json({
       success: true,
       message: `Deleted entire series (${totalToDelete} events)`,
       eventsDeleted: totalToDelete,
     });
-
   } catch (error: any) {
     console.error('Unexpected error in DELETE /api/calendar-events/series:', error);
     return NextResponse.json(

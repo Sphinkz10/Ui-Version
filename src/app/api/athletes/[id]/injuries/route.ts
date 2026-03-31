@@ -219,8 +219,6 @@ export async function GET(
 
     // If found in database, return real data
     if (!error && injuries && injuries.length > 0) {
-      console.log(`✅ Loaded ${injuries.length} injuries from database for ${athleteId}`);
-      
       // Filter by status if specified
       let filteredInjuries = injuries;
       if (status && status !== 'all') {
@@ -262,11 +260,6 @@ export async function GET(
       });
     }
 
-    // ============================================================================
-    // FALLBACK TO MOCK DATA
-    // ============================================================================
-    console.log(`⚠️ No injuries in DB for ${athleteId}, returning mock data`);
-    
     let mockInjuries = MOCK_ATHLETE_INJURIES[athleteId] || MOCK_DEFAULT_INJURIES;
 
     // Filter by status if specified
@@ -311,7 +304,6 @@ export async function GET(
       stats,
       source: 'mock'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in GET /api/athletes/[id]/injuries:', error);
     return NextResponse.json(

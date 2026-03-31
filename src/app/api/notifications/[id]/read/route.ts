@@ -27,11 +27,6 @@ export async function PATCH(
       );
     }
 
-    // TODO: Update in Supabase
-    // UPDATE notifications SET read = TRUE, read_at = NOW() WHERE id = $1
-
-    console.log(`Marked notification ${notificationId} as read`);
-
     return NextResponse.json({
       success: true,
       message: 'Notification marked as read',

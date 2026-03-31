@@ -120,7 +120,6 @@ export async function POST(
       }
 
       targetMetricId = newMetric.id;
-      console.log(`✅ [Auto-Create] Metric created: ${newMetric.name} (${newMetric.id})`);
     }
 
     if (!targetMetricId) {
@@ -162,13 +161,10 @@ export async function POST(
       );
     }
 
-    console.log(`✅ [Link] Created: ${field_name} → ${link.metrics.name}`);
-
     return NextResponse.json({
       link,
       message: 'Metric link created successfully'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in POST metric-links:', error);
     return NextResponse.json(

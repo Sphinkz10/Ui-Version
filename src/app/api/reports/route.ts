@@ -23,7 +23,7 @@ import { createClient } from '@/utils/supabase/server';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const workspaceId = searchParams.get('workspaceId');
     const category = searchParams.get('category');
     const isTemplate = searchParams.get('isTemplate');
@@ -76,15 +76,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Fetched ${reports?.length || 0} reports`);
-
     return NextResponse.json({
       reports: reports || [],
       count: count || 0,
       limit,
       offset
     });
-
   } catch (error: any) {
     console.error('Unexpected error in GET /api/reports:', error);
     return NextResponse.json(
@@ -177,13 +174,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Created report: ${report.name} (${report.id})`);
-
     return NextResponse.json({
       report,
       message: 'Report created successfully'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in POST /api/reports:', error);
     return NextResponse.json(

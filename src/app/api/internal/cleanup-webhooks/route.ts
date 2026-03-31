@@ -36,14 +36,12 @@ export async function POST(request: NextRequest) {
     }
 
     const deletedCount = deleted?.length || 0;
-    console.log(`🗑️ Cleaned up ${deletedCount} old webhook deliveries`);
 
     return NextResponse.json({
       success: true,
       deleted: deletedCount,
       cutoffDate: thirtyDaysAgo.toISOString(),
     });
-
   } catch (error: any) {
     console.error('Unexpected error in cleanup-webhooks:', error);
     return NextResponse.json(

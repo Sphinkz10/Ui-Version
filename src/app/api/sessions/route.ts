@@ -10,7 +10,7 @@ import * as kv from '@/supabase/functions/server/kv_store';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     const {
       workspaceId,
       calendarEventId,
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate unique session ID
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const sessionId = `session_${Date.now()}_${crypto.randomUUID()}`;
 
     // Create session record
     const session = {
@@ -48,16 +48,14 @@ export async function POST(request: NextRequest) {
 
     // Save to KV store
     await kv.set(`session:${sessionId}`, session);
-    
+
     // Index by workspace for queries
-    const workspaceSessions = await kv.get(`workspace:${workspaceId}:sessions`) || [];
+    const workspaceSessions = (await kv.get(`workspace:${workspaceId}:sessions`)) || [];
     workspaceSessions.push(sessionId);
     await kv.set(`workspace:${workspaceId}:sessions`, workspaceSessions);
 
     // Index by calendar event
     await kv.set(`calendar_event:${calendarEventId}:session`, sessionId);
-
-    console.log(`✅ Session created: ${sessionId}`);
 
     return NextResponse.json({
       success: true,
@@ -67,7 +65,6 @@ export async function POST(request: NextRequest) {
         startedAt: session.startedAt,
       },
     });
-
   } catch (error: any) {
     console.error('❌ Error creating session:', error);
     return NextResponse.json(
@@ -95,7 +92,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get session IDs for workspace
-    const sessionIds = await kv.get(`workspace:${workspaceId}:sessions`) || [];
+    const sessionIds = (await kv.get(`workspace:${workspaceId}:sessions`)) || [];
 
     // Fetch session details
     const sessions = await Promise.all(

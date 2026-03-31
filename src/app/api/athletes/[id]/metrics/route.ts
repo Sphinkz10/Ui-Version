@@ -256,11 +256,6 @@ export async function GET(
 
     const supabase = await createClient();
 
-    // TODO: Fetch real metrics from metric_updates table
-    // For now, return mock data
-    
-    console.log(`⚠️ Fetching metrics for ${athleteId} - returning mock data`);
-    
     const mockMetrics = MOCK_ATHLETE_METRICS[athleteId] || MOCK_DEFAULT_METRICS;
 
     // Group metrics by category
@@ -299,7 +294,6 @@ export async function GET(
       summary,
       source: 'mock'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in GET /api/athletes/[id]/metrics:', error);
     return NextResponse.json(

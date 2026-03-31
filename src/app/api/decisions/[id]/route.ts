@@ -89,7 +89,7 @@ export async function PATCH(
   try {
     const { id } = params;
     const body: UpdateDecisionRequest = await request.json();
-    
+
     // Validate status
     if (!['applied', 'dismissed'].includes(body.status)) {
       return NextResponse.json(
@@ -97,7 +97,7 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    
+
     // Validate dismissReason if dismissing
     if (body.status === 'dismissed' && !body.dismissReason) {
       return NextResponse.json(
@@ -105,17 +105,17 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    
+
     // Find decision
     const decision = mockDecisions.find(d => d.id === id);
-    
+
     if (!decision) {
       return NextResponse.json(
         { error: 'Decision not found' },
         { status: 404 }
       );
     }
-    
+
     // Check if already processed
     if (decision.status !== 'pending') {
       return NextResponse.json(
@@ -126,16 +126,16 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    
+
     // Build update object
     const now = new Date().toISOString();
     const userId = 'coach-001'; // TODO: Get from auth session
-    
+
     const updates: Partial<Decision> = {
       status: body.status,
       notes: body.notes,
     };
-    
+
     if (body.status === 'applied') {
       updates.appliedAt = now;
       updates.appliedBy = userId;
@@ -144,19 +144,10 @@ export async function PATCH(
       updates.dismissedBy = userId;
       updates.dismissReason = body.dismissReason;
     }
-    
+
     // Apply updates (mock)
     Object.assign(decision, updates);
-    
-    // TODO: In production, update database
-    // const supabase = createClient();
-    // const { error } = await supabase
-    //   .from('decisions')
-    //   .update(updates)
-    //   .eq('id', id);
-    
-    console.log(`[API] Decision ${id} updated to ${body.status} by ${userId}`);
-    
+
     return NextResponse.json(
       { 
         success: true,
@@ -164,7 +155,6 @@ export async function PATCH(
       },
       { status: 200 }
     );
-    
   } catch (error) {
     console.error('[API] Error updating decision:', error);
     
@@ -194,7 +184,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = params;
-    
+
     // TODO: Check admin permissions
     // const session = await getSession();
     // if (!session.user.isAdmin) {
@@ -203,29 +193,20 @@ export async function DELETE(
     //     { status: 403 }
     //   );
     // }
-    
+
     // Find decision
     const decisionIndex = mockDecisions.findIndex(d => d.id === id);
-    
+
     if (decisionIndex === -1) {
       return NextResponse.json(
         { error: 'Decision not found' },
         { status: 404 }
       );
     }
-    
+
     // Remove from mock array (in production, delete from DB)
     mockDecisions.splice(decisionIndex, 1);
-    
-    // TODO: In production, delete from database
-    // const supabase = createClient();
-    // const { error } = await supabase
-    //   .from('decisions')
-    //   .delete()
-    //   .eq('id', id);
-    
-    console.log(`[API] Decision ${id} deleted`);
-    
+
     return NextResponse.json(
       { 
         success: true,
@@ -233,7 +214,6 @@ export async function DELETE(
       },
       { status: 200 }
     );
-    
   } catch (error) {
     console.error('[API] Error deleting decision:', error);
     

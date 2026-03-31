@@ -25,7 +25,7 @@ export async function POST(
   try {
     const { id: sessionId } = await context.params;
     const body = await request.json();
-    
+
     const { snapshotData, completedAt } = body;
 
     if (!snapshotData) {
@@ -34,8 +34,6 @@ export async function POST(
         { status: 400 }
       );
     }
-
-    console.log(`📸 [Snapshot] Saving snapshot for session: ${sessionId}`);
 
     const supabase = await createClient();
 
@@ -69,8 +67,6 @@ export async function POST(
       ...snapshotData,
     };
 
-    console.log(`📸 [Snapshot] Built snapshot with ${snapshotData.athletes?.length || 0} athletes`);
-
     // ============================================================
     // 3. UPDATE SESSION WITH SNAPSHOT (IMMUTABLE!)
     // ============================================================
@@ -92,8 +88,6 @@ export async function POST(
       );
     }
 
-    console.log(`✅ [Snapshot] Session snapshot saved (immutable)`);
-
     // ============================================================
     // 4. PROCESS EACH ATHLETE
     // ============================================================
@@ -102,8 +96,6 @@ export async function POST(
 
     for (const athleteSnapshot of snapshot.athletes || []) {
       const athleteId = athleteSnapshot.athleteId;
-      
-      console.log(`👤 [Snapshot] Processing athlete: ${athleteId}`);
 
       // ============================================================
       // 4a. CALCULATE ATHLETE AGGREGATES
@@ -165,9 +157,7 @@ export async function POST(
 
       if (saError) {
         console.error(`❌ [Snapshot] Failed to update session_athletes for ${athleteId}:`, saError);
-      } else {
-        console.log(`✅ [Snapshot] Updated session_athletes: volume=${totalVolume}, sets=${totalSets}, rpe=${avgRPE}`);
-      }
+      } else {}
 
       // ============================================================
       // 4d. CREATE PERSONAL RECORDS
@@ -215,7 +205,6 @@ export async function POST(
           if (prError) {
             console.error(`❌ [Snapshot] Failed to create PR:`, prError);
           } else {
-            console.log(`🏆 [Snapshot] NEW RECORD! ${pr.exerciseName}: ${pr.value}${pr.unit} (was ${previousBest})`);
             personalRecords.push(newRecord);
           }
         }
@@ -224,7 +213,7 @@ export async function POST(
       // ============================================================
       // 4e. CREATE METRIC UPDATES
       // ============================================================
-      
+
       // Training Load metric
       if (totalVolume > 0) {
         metricUpdates.push({
@@ -278,9 +267,7 @@ export async function POST(
 
       if (muError) {
         console.error(`❌ [Snapshot] Failed to create metric updates:`, muError);
-      } else {
-        console.log(`✅ [Snapshot] Created ${metricUpdates.length} metric updates`);
-      }
+      } else {}
     }
 
     // ============================================================
@@ -302,10 +289,7 @@ export async function POST(
       message: `Session snapshot saved! Created ${personalRecords.length} PRs and ${metricUpdates.length} metric updates.`
     };
 
-    console.log(`✅ [Snapshot] Complete!`, response.stats);
-
     return NextResponse.json(response);
-
   } catch (error: any) {
     console.error('❌ [Snapshot] Unexpected error:', error);
     

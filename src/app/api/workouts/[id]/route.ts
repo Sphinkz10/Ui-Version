@@ -159,13 +159,10 @@ export async function PUT(
       );
     }
 
-    console.log(`✅ [API] Updated workout: ${id}`);
-
     return NextResponse.json({
       workout,
       message: 'Workout updated successfully'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in PUT /api/workouts/[id]:', error);
     return NextResponse.json(
@@ -204,12 +201,9 @@ export async function DELETE(
       );
     }
 
-    console.log(`✅ [API] Deleted workout: ${id}`);
-
     return NextResponse.json({
       message: 'Workout deleted successfully'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in DELETE /api/workouts/[id]:', error);
     return NextResponse.json(

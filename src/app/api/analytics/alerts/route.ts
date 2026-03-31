@@ -21,7 +21,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const workspaceId = searchParams.get('workspaceId');
     const types = searchParams.get('types');
 
@@ -32,9 +32,6 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    // 🚀 TEMPORARY MOCK DATA - Replace with real DB queries when populated
-    console.log('⚠️ Using MOCK data for alerts (DB is empty)');
 
     const mockAlerts = {
       pain: [
@@ -153,7 +150,6 @@ export async function GET(request: NextRequest) {
       alerts: mockAlerts,
       mock: true,
     });
-
   } catch (error: any) {
     console.error('Unexpected error in GET /api/analytics/alerts:', error);
     return NextResponse.json(

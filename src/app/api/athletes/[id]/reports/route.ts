@@ -224,8 +224,6 @@ export async function GET(
 
     // If found in database, return real data
     if (!error && reports && reports.length > 0) {
-      console.log(`✅ Loaded ${reports.length} reports from database for ${athleteId}`);
-      
       // Transform created_by from object to string
       const transformedReports = reports.map(r => ({
         ...r,
@@ -269,11 +267,6 @@ export async function GET(
       });
     }
 
-    // ============================================================================
-    // FALLBACK TO MOCK DATA
-    // ============================================================================
-    console.log(`⚠️ No reports in DB for ${athleteId}, returning mock data`);
-    
     let mockReports = MOCK_ATHLETE_REPORTS[athleteId] || MOCK_DEFAULT_REPORTS;
 
     // Filter by type if specified
@@ -313,7 +306,6 @@ export async function GET(
       summary,
       source: 'mock'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in GET /api/athletes/[id]/reports:', error);
     return NextResponse.json(

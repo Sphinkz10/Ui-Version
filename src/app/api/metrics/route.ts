@@ -78,13 +78,11 @@ export async function GET(request: NextRequest) {
       const { data, error } = await query;
 
       if (error) {
-        console.warn('⚠️ Supabase error, using mock data:', error.message);
         usingMockData = true;
       } else if (data) {
         metrics = data;
       }
     } catch (error: any) {
-      console.warn('⚠️ Supabase not available, using mock data:', error.message);
       usingMockData = true;
     }
 

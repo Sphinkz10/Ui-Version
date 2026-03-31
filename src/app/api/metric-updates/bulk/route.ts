@@ -61,8 +61,6 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    console.log(`📦 [API] Bulk creating ${updates.length} metric updates for metric ${metricId}`);
-
     // Bulk insert
     const { data: created, error } = await supabase
       .from('metric_updates')
@@ -77,14 +75,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Successfully created ${created?.length || 0} metric updates`);
-
     return NextResponse.json({
       updates: created,
       count: created?.length || 0,
       message: `${created?.length || 0} metric updates created successfully`
     });
-
   } catch (error: any) {
     console.error('Unexpected error in POST /api/metric-updates/bulk:', error);
     return NextResponse.json(

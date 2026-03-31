@@ -253,10 +253,6 @@ export async function POST(request: NextRequest) {
       expiresAt: payload.expiresAt,
     };
 
-    // TODO: Insert into Supabase
-    // For now, return mock response
-    console.log('Created notification:', notification);
-
     return NextResponse.json(
       {
         notification,

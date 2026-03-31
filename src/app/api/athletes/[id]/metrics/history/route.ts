@@ -10,8 +10,6 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const days = parseInt(searchParams.get('days') || '30');
 
-    console.log('📊 Metrics history API called for athlete:', athleteId, 'days:', days);
-
     const generateHistory = (metricId: string, baseValue: number, variation: number) => {
       const data = [];
       for (let i = days - 1; i >= 0; i--) {
@@ -93,10 +91,7 @@ export async function GET(
       total_updates: metrics.reduce((sum, m) => sum + m.data.length, 0)
     };
 
-    console.log(`✅ Generated ${metrics.length} metrics with ${response.total_updates} data points`);
-
     return NextResponse.json(response);
-
   } catch (error: any) {
     console.error('❌ Error in metrics history API:', error);
     

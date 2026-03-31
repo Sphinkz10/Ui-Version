@@ -99,13 +99,10 @@ export async function PUT(
       );
     }
 
-    console.log(`✅ [API] Updated metric update: ${id}`);
-
     return NextResponse.json({
       update,
       message: 'Metric update updated successfully'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in PUT /api/metric-updates/[id]:', error);
     return NextResponse.json(
@@ -140,12 +137,9 @@ export async function DELETE(
       );
     }
 
-    console.log(`✅ [API] Deleted metric update: ${id}`);
-
     return NextResponse.json({
       message: 'Metric update deleted successfully'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in DELETE /api/metric-updates/[id]:', error);
     return NextResponse.json(

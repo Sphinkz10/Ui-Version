@@ -23,7 +23,7 @@ import { createClient } from '@/utils/supabase/server';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const workspaceId = searchParams.get('workspaceId');
     const category = searchParams.get('category');
     const isActive = searchParams.get('isActive');
@@ -70,15 +70,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Fetched ${rules?.length || 0} automation rules`);
-
     return NextResponse.json({
       rules: rules || [],
       count: count || 0,
       limit,
       offset
     });
-
   } catch (error: any) {
     console.error('Unexpected error in GET /api/automation/rules:', error);
     return NextResponse.json(
@@ -172,13 +169,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Created automation rule: ${rule.name} (${rule.id})`);
-
     return NextResponse.json({
       rule,
       message: 'Automation rule created successfully'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in POST /api/automation/rules:', error);
     return NextResponse.json(

@@ -101,15 +101,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (!webhooks || webhooks.length === 0) {
-      console.log(`ℹ️ No webhooks listening to ${eventType}`);
       return NextResponse.json({
         success: true,
         triggered: 0,
         message: 'No webhooks found for this event',
       });
     }
-
-    console.log(`📡 Triggering ${webhooks.length} webhooks for ${eventType}`);
 
     // ==============================================================
     // STEP 2: Trigger each webhook
@@ -131,7 +128,6 @@ export async function POST(request: NextRequest) {
       failed: failures,
       message: `Triggered ${webhooks.length} webhooks (${successes} succeeded, ${failures} failed)`,
     });
-
   } catch (error: any) {
     console.error('❌ CRITICAL ERROR in POST /api/webhooks/trigger:', error);
     return NextResponse.json(
@@ -159,7 +155,6 @@ async function deliverWebhook(
 
   // Check if event matches filters (if any)
   if (webhook.filters && !matchesFilters(eventData, webhook.filters)) {
-    console.log(`⏭️ Webhook ${webhook.id} skipped - filters don't match`);
     return;
   }
 
@@ -218,9 +213,6 @@ async function deliverWebhook(
       deliveryStatus = 'failed';
       errorMessage = `HTTP ${response.status}: ${response.statusText}`;
     }
-
-    console.log(`✅ Webhook ${webhook.id} delivered: ${httpStatus}`);
-
   } catch (error: any) {
     deliveryStatus = 'failed';
     errorMessage = error.message;
@@ -273,7 +265,7 @@ async function deliverWebhook(
     if (attemptNumber < retryStrategy.maxRetries) {
       // Calculate backoff delay
       let delayMs = 0;
-      
+
       if (retryStrategy.backoff === 'exponential') {
         delayMs = Math.pow(2, attemptNumber) * 1000; // 2s, 4s, 8s
       } else if (retryStrategy.backoff === 'linear') {
@@ -281,14 +273,6 @@ async function deliverWebhook(
       } else {
         delayMs = 5000; // Fixed 5s
       }
-
-      console.log(`🔄 Scheduling retry ${attemptNumber + 1} in ${delayMs}ms`);
-
-      // In production, use a job queue (Bull, BullMQ, etc.)
-      // For now, just log that retry should happen
-      // setTimeout(() => {
-      //   deliverWebhook(webhook, eventType, eventData, supabase, attemptNumber + 1);
-      // }, delayMs);
     }
   }
 }

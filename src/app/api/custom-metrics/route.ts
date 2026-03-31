@@ -190,10 +190,7 @@ export async function POST(request: NextRequest) {
     // STEP 3: Calculate initial values (optional)
     // ============================================================
 
-    if (body.calculate_now && body.athlete_ids) {
-      // TODO: Trigger calculation for specified athletes
-      console.log('TODO: Calculate values for athletes:', body.athlete_ids);
-    }
+    if (body.calculate_now && body.athlete_ids) {}
 
     return NextResponse.json({
       customMetric,

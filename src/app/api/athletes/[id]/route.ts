@@ -66,8 +66,6 @@ export async function GET(
 
     // If not found, return 404 with structured error
     if (error || !athlete) {
-      console.log(`⚠️ Athlete ${athleteId} not found in database`);
-      
       return NextResponse.json(
         {
           athlete: null,

@@ -10,7 +10,7 @@ export async function PATCH(
   try {
     const { id } = params;
     const body = await request.json();
-    
+
     const { workspaceId, start_date, end_date, ...otherUpdates } = body;
 
     if (!workspaceId) {
@@ -29,8 +29,6 @@ export async function PATCH(
       end_date,
       updated_at: new Date().toISOString(),
     };
-
-    console.log(`✅ Event ${id} rescheduled to ${start_date}`);
 
     return NextResponse.json({
       event: updatedEvent,
@@ -63,9 +61,6 @@ export async function DELETE(
         { status: 400 }
       );
     }
-
-    // TODO: Delete from real database
-    console.log(`🗑️ Event ${id} deleted`);
 
     return NextResponse.json({
       message: 'Event deleted successfully'

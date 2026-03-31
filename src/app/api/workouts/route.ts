@@ -24,7 +24,7 @@ import { createClient } from '@/utils/supabase/server';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const workspaceId = searchParams.get('workspaceId');
     const category = searchParams.get('category');
     const isTemplate = searchParams.get('isTemplate');
@@ -76,15 +76,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Fetched ${workouts?.length || 0} workouts`);
-
     return NextResponse.json({
       workouts: workouts || [],
       count: count || 0,
       limit,
       offset
     });
-
   } catch (error: any) {
     console.error('Unexpected error in GET /api/workouts:', error);
     return NextResponse.json(
@@ -184,13 +181,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`✅ [API] Created workout: ${workout.name} (${workout.id})`);
-
     return NextResponse.json({
       workout,
       message: 'Workout created successfully'
     });
-
   } catch (error: any) {
     console.error('Unexpected error in POST /api/workouts:', error);
     return NextResponse.json(
