@@ -7,6 +7,11 @@ const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || 'https://eu.posthog.co
 let isInitialized = false;
 
 export const initAnalytics = () => {
+  // Check if user has explicitly accepted cookies
+  if (typeof window !== "undefined" && localStorage.getItem("vlogin-cookie-consent") !== "accepted") {
+    return;
+  }
+
   if (typeof window !== 'undefined' && !isInitialized) {
     posthog.init(POSTHOG_KEY, {
       api_host: POSTHOG_HOST,

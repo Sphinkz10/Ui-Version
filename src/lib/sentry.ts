@@ -1,6 +1,11 @@
 import * as Sentry from "@sentry/react";
 
 export function initSentry() {
+  // Check if user has explicitly accepted cookies
+  if (typeof window !== "undefined" && localStorage.getItem("vlogin-cookie-consent") !== "accepted") {
+    return;
+  }
+
   if (import.meta.env.VITE_SENTRY_DSN) {
     Sentry.init({
       dsn: import.meta.env.VITE_SENTRY_DSN,

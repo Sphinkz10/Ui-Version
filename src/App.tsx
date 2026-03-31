@@ -53,6 +53,7 @@ import { SendFormWizard } from "./components/wizards/SendFormWizard";
 import { CreateWorkspaceModal } from "./components/modals/CreateWorkspaceModal";
 import { CreateWorkoutModal } from "./components/modals/CreateWorkoutModal";
 import { ScheduleSessionModal } from "./components/modals/ScheduleSessionModal";
+import { CookieConsent } from "./components/shared/CookieConsent";
 import { WizardMain } from "./components/dataos/v2/wizard";
 import { CreateProjectModal } from "./components/modals/CreateProjectModal";
 import { ExecuteSessionModal } from "./components/modals/ExecuteSessionModal";
@@ -811,6 +812,7 @@ export default function App() {
     <AppProvider>
       <AuthenticatedApp />
       <Toaster position="top-right" />
+      <CookieConsent />
     </AppProvider>
   );
 }
