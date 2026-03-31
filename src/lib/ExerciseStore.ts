@@ -54,7 +54,7 @@ function saveToStorage(exercises: Exercise[]): boolean {
  * Generate unique ID
  */
 function generateId(): string {
-  return `ex_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  return `ex_${Date.now()}_${crypto.randomUUID()}`;
 }
 
 // =============================================================================

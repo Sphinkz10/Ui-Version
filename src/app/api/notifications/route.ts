@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
 
     // Create notification object
     const notification: Notification = {
-      id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `notif-${Date.now()}-${crypto.randomUUID()}`,
       workspaceId: payload.workspaceId,
       userId: payload.userId,
       type: payload.type,

@@ -612,7 +612,7 @@ function generateDecisionId(): string {
   const now = new Date();
   const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
   const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '');
-  const random = Math.random().toString(36).substring(2, 8);
+  const random = crypto.randomUUID().substring(0, 8);
   
   return `dec-${dateStr}-${timeStr}-${random}`;
 }
