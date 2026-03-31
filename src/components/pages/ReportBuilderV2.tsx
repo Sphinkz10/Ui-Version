@@ -47,6 +47,8 @@ import { Breadcrumbs } from "../layout/Breadcrumbs";
 import { AIAssistantModal } from "../modals/AIAssistantModal";
 import { ContextSelectionModal } from "../modals/ContextSelectionModal";
 import { GamificationOverlay } from "../overlays/GamificationOverlay";
+import { ReportHeader } from "./ReportBuilder/ReportHeader";
+import { ReportFilters } from "./ReportBuilder/ReportFilters";
 
 // ===== INTERFACES =====
 interface SmartQuestion {
@@ -1117,50 +1119,12 @@ export function ReportBuilderV2() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5">
           
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setViewMode("home")}
-                className="h-9 w-9 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors"
-              >
-                ←
-              </motion.button>
-              <div>
-                <input
-                  type="text"
-                  value={reportTitle}
-                  onChange={(e) => setReportTitle(e.target.value)}
-                  className="font-bold text-slate-900 bg-transparent border-none focus:outline-none text-lg w-full sm:w-auto"
-                  placeholder="Nome do Relatório"
-                />
-                <p className="text-sm text-slate-600">
-                  {generatedCharts.length} análise{generatedCharts.length !== 1 ? 's' : ''} com insights automáticos
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => toast.success("📄 Exportando para PDF...")}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl border-2 border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-all"
-              >
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Exportar</span>
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => toast.success("📤 Partilhando relatório...")}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md hover:from-emerald-400 hover:to-emerald-500 transition-all"
-              >
-                <Share2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Partilhar</span>
-              </motion.button>
-            </div>
-          </div>
+          <ReportHeader
+            onBack={() => setViewMode("home")}
+            reportTitle={reportTitle}
+            setReportTitle={setReportTitle}
+            chartsCount={generatedCharts.length}
+          />
 
           {/* Executive Summary */}
           <motion.div
@@ -1554,36 +1518,7 @@ export function ReportBuilderV2() {
                 </motion.div>
 
                 {/* Filters */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="rounded-2xl border border-slate-200 bg-white p-4"
-                >
-                  <h3 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-violet-600" />
-                    Filtros
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-xs font-medium text-slate-600 mb-1 block">Período</label>
-                      <select className="w-full p-2 text-sm border border-slate-200 rounded-lg bg-white">
-                        <option>Últimos 7 dias</option>
-                        <option>Últimos 30 dias</option>
-                        <option>Últimos 3 meses</option>
-                        <option>Personalizado</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-slate-600 mb-1 block">Atletas</label>
-                      <select className="w-full p-2 text-sm border border-slate-200 rounded-lg bg-white">
-                        <option>Todos</option>
-                        <option>João Silva</option>
-                        <option>Maria Santos</option>
-                      </select>
-                    </div>
-                  </div>
-                </motion.div>
+                <ReportFilters />
               </div>
 
               {/* Right Panel - Preview */}
