@@ -61,6 +61,7 @@ import { ActiveAthletesModal } from "./components/modals/ActiveAthletesModal";
 import { TodaySessionsModal } from "./components/modals/TodaySessionsModal";
 import { AlertsModal } from "./components/modals/AlertsModal";
 import { TestExecuteSession } from "./TestExecuteSession";
+import { LunaDashboardPage } from "./pages/LunaDashboardPage";
 
 // ============================================
 // TYPES & INTERFACES
@@ -332,6 +333,10 @@ function AppContent() {
     limit: 100, // Get all to count
   });
 
+  if (currentPage === "home") {
+    return <LunaDashboardPage onNavigate={(page) => setCurrentPage(page as Page)} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
       {/* Skip Navigation Link */}
@@ -471,21 +476,6 @@ function AppContent() {
             <p className="text-slate-500 font-medium">A carregar...</p>
           </div>
         }>
-          {currentPage === "home" && (
-            <Dashboard
-              onCreateWorkout={() => setCreateWorkoutOpen(true)}
-              onScheduleSession={() => setScheduleSessionOpen(true)}
-              onStartSession={(sessionId) => {
-                toast.success("Iniciando Live Command...");
-                // Navegar para Live Command
-                setCurrentPage("live-command");
-              }}
-              onViewActiveAthletes={() => setActiveAthletesOpen(true)}
-              onViewTodaySessions={() => setTodaySessionsOpen(true)}
-              onViewAlerts={() => setAlertsOpen(true)}
-              onNavigate={(page) => setCurrentPage(page as Page)}
-            />
-          )}
           {currentPage === "athletes" && (
             <Athletes
               onViewProfile={handleViewAthleteProfile}
